@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>PETLINK | Identificación de mascotas</title>
+
+    <link rel="stylesheet" href="estilo.css">
+</head>
+
+<body>
+
+    <header>
+        <h1>🐾 PETLINK</h1>
+
+        <p>
+            Identificación y recuperación de mascotas
+        </p>
+    </header>
+
+    <main>
+
+        <section>
+            <h2>Protege a tu mascota</h2>
+
+            <p>
+                PETLINK permite identificar a tu mascota mediante
+                un código QR único. Si algún día se pierde,
+                quien la encuentre podrá acceder a su perfil
+                y ayudarte a recuperarla.
+            </p>
+
+            <button id="btnRegistrar">
+                Registrar mascota
+            </button>
+
+            <div id="formulario" style="display: none;">
+
+                <h2>Registrar mascota</h2>
+
+                <input
+                    type="text"
+                    id="nombre"
+                    placeholder="Nombre de la mascota"
+                >
+
+                <input
+                    type="text"
+                    id="especie"
+                    placeholder="Perro, gato, etc."
+                >
+
+                <input
+                    type="text"
+                    id="raza"
+                    placeholder="Raza"
+                >
+
+                <input
+                    type="text"
+                    id="color"
+                    placeholder="Color"
+                >
+
+                <input
+                    type="text"
+                    id="sexo"
+                    placeholder="Sexo"
+                >
+
+                <button id="guardarMascota">
+                    Guardar mascota
+                </button>
+
+            </div>
+
+        </section>
+
+        <section>
+            <h2>¿Cómo funciona?</h2>
+
+            <p>1. Registra a tu mascota.</p>
+
+            <p>2. Obtén su código QR único.</p>
+
+            <p>3. Coloca el código QR en su collar.</p>
+
+            <p>
+                4. Si alguien encuentra a tu mascota,
+                puede escanear el código y contactarte.
+            </p>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>
+        2026 PETLINK - Conectando mascotas con sus familias 🐾
+        </p>
+    </footer>
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
