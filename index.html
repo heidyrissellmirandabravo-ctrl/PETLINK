@@ -82,24 +82,63 @@
             <h2>¿Cómo funciona?</h2>
 
             <p>1. Registra a tu mascota.</p>
-
             <p>2. Obtén su código QR único.</p>
-
             <p>3. Coloca el código QR en su collar.</p>
 
             <p>
                 4. Si alguien encuentra a tu mascota,
                 puede escanear el código y contactarte.
             </p>
+
         </section>
 
     </main>
 
     <footer>
+
         <p>
-        2026 PETLINK - Conectando mascotas con sus familias 🐾
+            © 2026 PETLINK - Conectando mascotas con sus familias 🐾
         </p>
+
     </footer>
+
+
+    <!-- FIREBASE -->
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+    <script>
+
+        const firebaseConfig = {
+
+            apiKey: "AIzaSyCJk4zNh8inO4vJ33iZNblSxHuHzFTTmw",
+
+            authDomain: "petlink-f16e2.firebaseapp.com",
+
+            projectId: "petlink-f16e2",
+
+            storageBucket: "petlink-f16e2.firebasestorage.app",
+
+            messagingSenderId: "898636920537",
+
+            appId: "1:898636920537:web:f5bc945291877d8821b0c8",
+
+            measurementId: "G-BGET3HJRHC"
+
+        };
+
+
+        firebase.initializeApp(firebaseConfig);
+
+
+        const db = firebase.firestore();
+
+    </script>
+
+
+    <!-- CÓDIGO DE PETLINK -->
 
     <script src="script.js"></script>
 
