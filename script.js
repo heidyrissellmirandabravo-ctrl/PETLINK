@@ -169,7 +169,10 @@ guardarMascota.addEventListener("click", async function () {
         console.error(error);
 
         alert(
-            "Ocurrió un error al guardar la mascota en Firebase."
+             "ERROR DE FIREBASE:\n\n" +
+        error.code +
+        "\n\n" +
+        error.message
         );
 
     }
