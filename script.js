@@ -15,307 +15,455 @@ btnRegistrar.addEventListener("click", function () {
 
 
 // -----------------------------------------
-// REGISTRAR MASCOTA EN FIREBASE
+// COMPRIMIR FOTO
 // -----------------------------------------
 
-guardarMascota.addEventListener("click", async function () {
+function comprimirFoto(archivo) {
 
-    const nombre =
-        document.getElementById("nombre").value.trim();
+    return new Promise((resolve, reject) => {
 
-    const especie =
-        document.getElementById("especie").value.trim();
+        const lector = new FileReader();
 
-    const raza =
-        document.getElementById("raza").value.trim();
+        lector.onload = function (evento) {
 
-    const color =
-        document.getElementById("color").value.trim();
+            const imagen = new Image();
 
-    const sexo =
-        document.getElementById("sexo").value.trim();
+            imagen.onload = function () {
 
-    const foto =
-        document.getElementById("foto").files[0];
+                const canvas = document.createElement("canvas");
 
+                const tamañoMaximo = 800;
 
-    // -----------------------------------------
-    // COMPROBAR DATOS
-    // -----------------------------------------
-
-    if (
-        nombre === "" ||
-        especie === "" ||
-        raza === "" ||
-        color === "" ||
-        sexo === ""
-    ) {
-
-        alert("Por favor, completa todos los datos.");
-
-        return;
-
-    }
+                let ancho = imagen.width;
+                let alto = imagen.height;
 
 
-    // -----------------------------------------
-    // COMPROBAR FOTO
-    // -----------------------------------------
+                if (ancho > alto) {
 
-    if (!foto) {
+                    if (ancho > tamañoMaximo) {
 
-        alert("Por favor, selecciona una foto de la mascota.");
+                        alto =
+                            alto *
+                            (tamañoMaximo / ancho);
 
-        return;
+                        ancho = tamañoMaximo;
 
-    }
+                    }
 
+                } else {
 
-    // -----------------------------------------
-    // COMPROBAR TIPO DE FOTO
-    // -----------------------------------------
+                    if (alto > tamañoMaximo) {
 
-    if (!foto.type.startsWith("image/")) {
+                        ancho =
+                            ancho *
+                            (tamañoMaximo / alto);
 
-        alert("El archivo seleccionado debe ser una imagen.");
+                        alto = tamañoMaximo;
 
-        return;
+                    }
 
-    }
-
-
-    // -----------------------------------------
-    // COMPROBAR TAMAÑO
-    // Máximo 5 MB
-    // -----------------------------------------
-
-    if (foto.size > 5 * 1024 * 1024) {
-
-        alert("La foto no debe superar los 5 MB.");
-
-        return;
-
-    }
+                }
 
 
-    // -----------------------------------------
-    // CREAR ID DE MASCOTA
-    // -----------------------------------------
-
-    const idMascota =
-        "PET-" + Date.now();
+                canvas.width = ancho;
+                canvas.height = alto;
 
 
-    try {
+                const contexto =
+                    canvas.getContext("2d");
 
-        // -----------------------------------------
-        // SUBIR FOTO A FIREBASE STORAGE
-        // -----------------------------------------
 
-        const referenciaFoto =
-            storage
-                .ref()
-                .child(
-                    "mascotas/" +
-                    idMascota +
-                    "/" +
-                    foto.name
+                contexto.drawImage(
+                    imagen,
+                    0,
+                    0,
+                    ancho,
+                    alto
                 );
 
 
-        await referenciaFoto.put(foto);
+                const fotoComprimida =
+                    canvas.toDataURL(
+                        "image/jpeg",
+                        0.7
+                    );
 
 
-        // -----------------------------------------
-        // OBTENER URL DE LA FOTO
-        // -----------------------------------------
+                resolve(fotoComprimida);
 
-        const urlFoto =
-            await referenciaFoto.getDownloadURL();
+            };
 
 
-        // -----------------------------------------
-        // CREAR DATOS DE LA MASCOTA
-        // -----------------------------------------
+            imagen.onerror = function () {
 
-        const mascota = {
+                reject(
+                    new Error(
+                        "No se pudo procesar la imagen."
+                    )
+                );
 
-            id: idMascota,
+            };
 
-            nombre: nombre,
 
-            especie: especie,
-
-            raza: raza,
-
-            color: color,
-
-            sexo: sexo,
-
-            foto: urlFoto
+            imagen.src = evento.target.result;
 
         };
 
 
+        lector.onerror = function () {
+
+            reject(
+                new Error(
+                    "No se pudo leer la fotografía."
+                )
+            );
+
+        };
+
+
+        lector.readAsDataURL(archivo);
+
+    });
+
+}
+
+
+// -----------------------------------------
+// REGISTRAR MASCOTA
+// -----------------------------------------
+
+guardarMascota.addEventListener(
+    "click",
+    async function () {
+
+        const nombre =
+            document
+                .getElementById("nombre")
+                .value
+                .trim();
+
+
+        const especie =
+            document
+                .getElementById("especie")
+                .value
+                .trim();
+
+
+        const raza =
+            document
+                .getElementById("raza")
+                .value
+                .trim();
+
+
+        const color =
+            document
+                .getElementById("color")
+                .value
+                .trim();
+
+
+        const sexo =
+            document
+                .getElementById("sexo")
+                .value
+                .trim();
+
+
+        const foto =
+            document
+                .getElementById("foto")
+                .files[0];
+
+
         // -----------------------------------------
-        // GUARDAR EN FIRESTORE
+        // COMPROBAR DATOS
         // -----------------------------------------
 
-        await db
-            .collection("mascotas")
-            .doc(idMascota)
-            .set(mascota);
+        if (
+            nombre === "" ||
+            especie === "" ||
+            raza === "" ||
+            color === "" ||
+            sexo === ""
+        ) {
 
+            alert(
+                "Por favor, completa todos los datos."
+            );
 
-        // -----------------------------------------
-        // CREAR LINK DEL PERFIL
-        // -----------------------------------------
-
-        const urlPerfil =
-            window.location.origin +
-            window.location.pathname +
-            "?id=" +
-            encodeURIComponent(idMascota);
-
-
-        // -----------------------------------------
-        // CREAR ZONA DEL QR
-        // -----------------------------------------
-
-        let zonaQR =
-            document.getElementById("zonaQR");
-
-
-        if (!zonaQR) {
-
-            zonaQR =
-                document.createElement("div");
-
-            zonaQR.id = "zonaQR";
-
-            zonaQR.style.marginTop = "25px";
-
-            formulario.appendChild(zonaQR);
+            return;
 
         }
 
 
         // -----------------------------------------
-        // MOSTRAR RESULTADO
+        // COMPROBAR FOTO
         // -----------------------------------------
 
-        zonaQR.innerHTML = `
+        if (!foto) {
 
-            <h2>🐾 Mascota registrada</h2>
+            alert(
+                "Por favor, selecciona una foto de la mascota."
+            );
 
-            <p>
-                <strong>Nombre:</strong>
-                ${nombre}
-            </p>
+            return;
 
-            <p>
-                <strong>Código PETLINK:</strong>
-                ${idMascota}
-            </p>
+        }
 
-            <p>
-                <strong>Foto:</strong>
-            </p>
 
-            <img
-                src="${urlFoto}"
-                alt="Foto de ${nombre}"
-                style="
-                    width: 220px;
-                    max-width: 100%;
-                    border-radius: 12px;
-                    display: block;
-                    margin: 10px auto;
-                "
-            >
+        if (!foto.type.startsWith("image/")) {
 
-            <p>
-                <strong>Enlace del perfil:</strong>
-            </p>
+            alert(
+                "El archivo seleccionado debe ser una imagen."
+            );
 
-            <p>
+            return;
 
-                <a
-                    href="${urlPerfil}"
-                    target="_blank"
+        }
+
+
+        // -----------------------------------------
+        // COMPROBAR TAMAÑO
+        // -----------------------------------------
+
+        if (foto.size > 5 * 1024 * 1024) {
+
+            alert(
+                "La foto no debe superar los 5 MB."
+            );
+
+            return;
+
+        }
+
+
+        try {
+
+            // -----------------------------------------
+            // MENSAJE DE PROCESAMIENTO
+            // -----------------------------------------
+
+            guardarMascota.disabled = true;
+
+            guardarMascota.textContent =
+                "Guardando mascota...";
+
+
+            // -----------------------------------------
+            // CREAR ID
+            // -----------------------------------------
+
+            const idMascota =
+                "PET-" + Date.now();
+
+
+            // -----------------------------------------
+            // COMPRIMIR FOTO
+            // -----------------------------------------
+
+            const fotoBase64 =
+                await comprimirFoto(foto);
+
+
+            // -----------------------------------------
+            // CREAR DATOS
+            // -----------------------------------------
+
+            const mascota = {
+
+                id: idMascota,
+
+                nombre: nombre,
+
+                especie: especie,
+
+                raza: raza,
+
+                color: color,
+
+                sexo: sexo,
+
+                foto: fotoBase64
+
+            };
+
+
+            // -----------------------------------------
+            // GUARDAR EN FIRESTORE
+            // -----------------------------------------
+
+            await db
+                .collection("mascotas")
+                .doc(idMascota)
+                .set(mascota);
+
+
+            // -----------------------------------------
+            // CREAR LINK DEL PERFIL
+            // -----------------------------------------
+
+            const urlPerfil =
+                window.location.origin +
+                window.location.pathname +
+                "?id=" +
+                encodeURIComponent(idMascota);
+
+
+            // -----------------------------------------
+            // CREAR ZONA QR
+            // -----------------------------------------
+
+            let zonaQR =
+                document.getElementById("zonaQR");
+
+
+            if (!zonaQR) {
+
+                zonaQR =
+                    document.createElement("div");
+
+                zonaQR.id = "zonaQR";
+
+                zonaQR.style.marginTop = "25px";
+
+                formulario.appendChild(zonaQR);
+
+            }
+
+
+            // -----------------------------------------
+            // MOSTRAR RESULTADO
+            // -----------------------------------------
+
+            zonaQR.innerHTML = `
+
+                <h2>🐾 Mascota registrada</h2>
+
+                <p>
+                    <strong>Nombre:</strong>
+                    ${nombre}
+                </p>
+
+                <p>
+                    <strong>Código PETLINK:</strong>
+                    ${idMascota}
+                </p>
+
+                <p>
+                    <strong>Foto:</strong>
+                </p>
+
+                <img
+                    src="${fotoBase64}"
+                    alt="Foto de ${nombre}"
+                    style="
+                        width: 220px;
+                        max-width: 100%;
+                        border-radius: 12px;
+                        display: block;
+                        margin: 10px auto;
+                    "
                 >
-                    ${urlPerfil}
-                </a>
 
-            </p>
+                <p>
+                    <strong>Enlace del perfil:</strong>
+                </p>
 
-            <div id="codigoQR"></div>
+                <p>
 
-        `;
+                    <a
+                        href="${urlPerfil}"
+                        target="_blank"
+                    >
+                        ${urlPerfil}
+                    </a>
 
+                </p>
 
-        // -----------------------------------------
-        // CARGAR GENERADOR QR
-        // -----------------------------------------
+                <div id="codigoQR"></div>
 
-        const qrScript =
-            document.createElement("script");
-
-
-        qrScript.src =
-            "https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js";
-
-
-        qrScript.onload = function () {
-
-            const codigoQR =
-                document.getElementById("codigoQR");
+            `;
 
 
-            codigoQR.innerHTML = "";
+            // -----------------------------------------
+            // GENERAR QR
+            // -----------------------------------------
+
+            const qrScript =
+                document.createElement("script");
 
 
-            new QRCode(codigoQR, {
-
-                text: urlPerfil,
-
-                width: 200,
-
-                height: 200
-
-            });
-
-        };
+            qrScript.src =
+                "https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js";
 
 
-        document.head.appendChild(qrScript);
+            qrScript.onload = function () {
+
+                const codigoQR =
+                    document.getElementById("codigoQR");
 
 
-        // -----------------------------------------
-        // MENSAJE DE ÉXITO
-        // -----------------------------------------
-
-        alert(
-            "¡Mascota registrada correctamente! 🐾\n\n" +
-            "Código PETLINK: " +
-            idMascota
-        );
+                codigoQR.innerHTML = "";
 
 
-    } catch (error) {
+                new QRCode(
+                    codigoQR,
+                    {
 
-        console.error(error);
+                        text: urlPerfil,
 
-        alert(
-            "ERROR AL GUARDAR LA MASCOTA:\n\n" +
-            error.code +
-            "\n\n" +
-            error.message
-        );
+                        width: 200,
+
+                        height: 200
+
+                    }
+                );
+
+            };
+
+
+            document.head.appendChild(qrScript);
+
+
+            // -----------------------------------------
+            // ÉXITO
+            // -----------------------------------------
+
+            alert(
+                "¡Mascota registrada correctamente! 🐾\n\n" +
+                "Código PETLINK: " +
+                idMascota
+            );
+
+
+            guardarMascota.disabled = false;
+
+            guardarMascota.textContent =
+                "Guardar mascota";
+
+
+        } catch (error) {
+
+            console.error(error);
+
+
+            alert(
+                "ERROR AL GUARDAR LA MASCOTA:\n\n" +
+                error.message
+            );
+
+
+            guardarMascota.disabled = false;
+
+            guardarMascota.textContent =
+                "Guardar mascota";
+
+        }
 
     }
-
-});
+);
 
 
 // -----------------------------------------
@@ -340,7 +488,7 @@ if (idBuscado) {
 
 
 // -----------------------------------------
-// BUSCAR MASCOTA EN FIREBASE
+// BUSCAR MASCOTA EN FIRESTORE
 // -----------------------------------------
 
 async function buscarMascota(id) {
