@@ -44,10 +44,10 @@ function comprimirFoto(archivo) {
                     if (ancho > tamañoMaximo) {
 
                         alto =
-                            alto *
-                            (tamañoMaximo / ancho);
+                            alto * (tamañoMaximo / ancho);
 
                         ancho = tamañoMaximo;
+
                     }
 
                 } else {
@@ -55,11 +55,12 @@ function comprimirFoto(archivo) {
                     if (alto > tamañoMaximo) {
 
                         ancho =
-                            ancho *
-                            (tamañoMaximo / alto);
+                            ancho * (tamañoMaximo / alto);
 
                         alto = tamañoMaximo;
+
                     }
+
                 }
 
 
@@ -88,6 +89,7 @@ function comprimirFoto(archivo) {
 
 
                 resolve(fotoComprimida);
+
             };
 
 
@@ -104,6 +106,7 @@ function comprimirFoto(archivo) {
 
             imagen.src =
                 evento.target.result;
+
         };
 
 
@@ -168,6 +171,13 @@ guardarMascota.addEventListener(
                 .trim();
 
 
+        const whatsapp =
+            document
+                .getElementById("whatsapp")
+                .value
+                .trim();
+
+
         const clave =
             document
                 .getElementById("clave")
@@ -201,6 +211,26 @@ guardarMascota.addEventListener(
 
             alert(
                 "Por favor, completa todos los datos."
+            );
+
+            return;
+        }
+
+
+        if (whatsapp === "") {
+
+            alert(
+                "Por favor, ingresa el número de WhatsApp."
+            );
+
+            return;
+        }
+
+
+        if (!/^[0-9]{8,15}$/.test(whatsapp)) {
+
+            alert(
+                "El número de WhatsApp debe contener solamente números, entre 8 y 15 dígitos."
             );
 
             return;
@@ -266,7 +296,7 @@ guardarMascota.addEventListener(
 
 
             // ========================================
-            // CREAR ID PETLINK
+            // CREAR CÓDIGO PETLINK
             // ========================================
 
             const idMascota =
@@ -282,7 +312,7 @@ guardarMascota.addEventListener(
 
 
             // ========================================
-            // CREAR OBJETO DE MASCOTA
+            // DATOS DE LA MASCOTA
             // ========================================
 
             const mascota = {
@@ -301,9 +331,12 @@ guardarMascota.addEventListener(
 
                 estado: estado,
 
+                whatsapp: whatsapp,
+
                 foto: fotoBase64,
 
                 clave: clave
+
             };
 
 
@@ -318,7 +351,7 @@ guardarMascota.addEventListener(
 
 
             // ========================================
-            // CREAR URL DEL PERFIL
+            // CREAR ENLACE DEL PERFIL
             // ========================================
 
             const urlPerfil =
@@ -331,7 +364,7 @@ guardarMascota.addEventListener(
 
 
             // ========================================
-            // CREAR ZONA DEL QR
+            // MOSTRAR RESULTADO
             // ========================================
 
             let zonaQR =
@@ -356,6 +389,7 @@ guardarMascota.addEventListener(
                 formulario.appendChild(
                     zonaQR
                 );
+
             }
 
 
@@ -465,10 +499,6 @@ guardarMascota.addEventListener(
             );
 
 
-            // ========================================
-            // MENSAJE DE ÉXITO
-            // ========================================
-
             alert(
 
                 "¡Mascota registrada correctamente! 🐾\n\n" +
@@ -479,11 +509,8 @@ guardarMascota.addEventListener(
                 "\n\n" +
 
                 "Estado: " +
-                estado +
+                estado
 
-                "\n\n" +
-
-                "Tu clave privada fue guardada para administrar la mascota."
             );
 
 
@@ -543,7 +570,7 @@ if (idBuscado) {
 
 
 // ========================================
-// BUSCAR MASCOTA EN FIREBASE
+// BUSCAR MASCOTA
 // ========================================
 
 async function buscarMascota(id) {
@@ -563,9 +590,7 @@ async function buscarMascota(id) {
                 documento.data();
 
 
-            mostrarPerfil(
-                mascota
-            );
+            mostrarPerfil(mascota);
 
         } else {
 
@@ -679,15 +704,19 @@ function mostrarPerfil(mascota) {
 
                 <p>
                     Si encontraste a esta mascota,
-                    puedes comunicarte con su dueño.
+                    puedes comunicarte directamente
+                    con su propietario.
                 </p>
 
 
                 <button
-                    onclick="contactarWhatsApp('${mascota.nombre}')"
+                    onclick="contactarWhatsApp(
+                        '${mascota.whatsapp || ""}',
+                        '${mascota.nombre}'
+                    )"
                 >
 
-                    💬 Contactar al dueño
+                    💬 Contactar al dueño por WhatsApp
 
                 </button>
 
@@ -698,13 +727,6 @@ function mostrarPerfil(mascota) {
                 <h3>
                     🔐 Administración del propietario
                 </h3>
-
-
-                <p>
-                    El propietario puede acceder
-                    posteriormente para actualizar
-                    el estado de la mascota.
-                </p>
 
 
                 <button
@@ -748,6 +770,7 @@ function abrirAdministracion(idMascota) {
     if (claveIngresada === null) {
 
         return;
+
     }
 
 
@@ -758,6 +781,7 @@ function abrirAdministracion(idMascota) {
         );
 
         return;
+
     }
 
 
@@ -794,6 +818,7 @@ async function verificarClave(
             );
 
             return;
+
         }
 
 
@@ -811,6 +836,7 @@ async function verificarClave(
             );
 
             return;
+
         }
 
 
@@ -976,6 +1002,7 @@ async function actualizarEstado(
             "\n\n" +
 
             "El código QR sigue siendo el mismo."
+
         );
 
 
@@ -1043,26 +1070,40 @@ function mostrarMascotaNoEncontrada() {
 
 
 // ========================================
-// WHATSAPP
+// CONTACTAR POR WHATSAPP
 // ========================================
 
 function contactarWhatsApp(
+    numero,
     nombreMascota
 ) {
+
+    if (
+        !numero ||
+        numero.trim() === ""
+    ) {
+
+        alert(
+            "El propietario todavía no ha registrado un número de WhatsApp."
+        );
+
+        return;
+
+    }
+
 
     const mensaje =
 
         "Hola, encontré a tu mascota " +
-
         nombreMascota +
-
         ". Escaneé su código PETLINK.";
 
 
     const enlace =
 
-        "https://wa.me/?text=" +
-
+        "https://wa.me/" +
+        numero +
+        "?text=" +
         encodeURIComponent(
             mensaje
         );
