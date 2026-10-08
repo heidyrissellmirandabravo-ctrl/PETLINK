@@ -2,22 +2,206 @@
 <html lang="es">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>PETLINK | Identificación de mascotas</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <link rel="stylesheet" href="estilo.css">
+    <title>PETLINK</title>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+
+    <style>
+
+        body {
+
+            font-family: Arial, sans-serif;
+
+            margin: 0;
+
+            padding: 0;
+
+            background-color: #f4f7f6;
+
+            color: #333;
+
+        }
+
+
+        header {
+
+            background-color: #2e7d32;
+
+            color: white;
+
+            text-align: center;
+
+            padding: 25px 15px;
+
+        }
+
+
+        header h1 {
+
+            margin: 0;
+
+            font-size: 32px;
+
+        }
+
+
+        header p {
+
+            margin-top: 8px;
+
+        }
+
+
+        main {
+
+            max-width: 650px;
+
+            margin: 30px auto;
+
+            padding: 20px;
+
+        }
+
+
+        section {
+
+            background-color: white;
+
+            padding: 25px;
+
+            border-radius: 15px;
+
+            box-shadow:
+                0 3px 12px rgba(0,0,0,0.10);
+
+        }
+
+
+        h2 {
+
+            color: #2e7d32;
+
+        }
+
+
+        h3 {
+
+            color: #388e3c;
+
+        }
+
+
+        label {
+
+            display: block;
+
+            margin-top: 15px;
+
+            margin-bottom: 6px;
+
+            font-weight: bold;
+
+        }
+
+
+        input,
+        select {
+
+            width: 100%;
+
+            box-sizing: border-box;
+
+            padding: 12px;
+
+            border: 1px solid #ccc;
+
+            border-radius: 8px;
+
+            font-size: 16px;
+
+        }
+
+
+        button {
+
+            width: 100%;
+
+            margin-top: 20px;
+
+            padding: 13px;
+
+            border: none;
+
+            border-radius: 8px;
+
+            background-color: #2e7d32;
+
+            color: white;
+
+            font-size: 16px;
+
+            cursor: pointer;
+
+        }
+
+
+        button:hover {
+
+            background-color: #1b5e20;
+
+        }
+
+
+        small {
+
+            color: #666;
+
+        }
+
+
+        #formulario {
+
+            display: none;
+
+        }
+
+
+        footer {
+
+            text-align: center;
+
+            padding: 20px;
+
+            color: #666;
+
+        }
+
+    </style>
+
 </head>
 
+
 <body>
+
 
     <header>
 
         <h1>🐾 PETLINK</h1>
 
         <p>
-            Identificación y recuperación de mascotas
+            Sistema de identificación y recuperación de mascotas
         </p>
 
     </header>
@@ -25,170 +209,201 @@
 
     <main>
 
-        <section>
 
-            <h2>Protege a tu mascota</h2>
+        <!-- PÁGINA PRINCIPAL -->
+
+        <section id="inicio">
+
+            <h2>
+                Bienvenido a PETLINK
+            </h2>
 
             <p>
-                PETLINK permite identificar a tu mascota mediante
-                un código QR único. Si algún día se pierde,
-                quien la encuentre podrá acceder a su perfil
-                y ayudarte a recuperarla.
+                Registra a tu mascota y genera un código QR
+                que permitirá identificarla y facilitar
+                el contacto con su propietario.
             </p>
 
 
-            <button id="btnRegistrar">
-                Registrar mascota
+            <button
+                id="btnRegistrar"
+            >
+                🐾 Registrar mascota
+            </button>
+
+        </section>
+
+
+        <!-- FORMULARIO -->
+
+        <section
+            id="formulario"
+            style="margin-top: 25px;"
+        >
+
+            <h2>
+                🐶 Registrar mascota
+            </h2>
+
+
+            <!-- NOMBRE -->
+
+            <label for="nombre">
+                Nombre de la mascota
+            </label>
+
+            <input
+                type="text"
+                id="nombre"
+                placeholder="Ejemplo: Max"
+            >
+
+
+            <!-- ESPECIE -->
+
+            <label for="especie">
+                Especie
+            </label>
+
+            <input
+                type="text"
+                id="especie"
+                placeholder="Ejemplo: Perro"
+            >
+
+
+            <!-- RAZA -->
+
+            <label for="raza">
+                Raza
+            </label>
+
+            <input
+                type="text"
+                id="raza"
+                placeholder="Ejemplo: Labrador"
+            >
+
+
+            <!-- COLOR -->
+
+            <label for="color">
+                Color
+            </label>
+
+            <input
+                type="text"
+                id="color"
+                placeholder="Ejemplo: Marrón"
+            >
+
+
+            <!-- SEXO -->
+
+            <label for="sexo">
+                Sexo
+            </label>
+
+            <select id="sexo">
+
+                <option value="">
+                    Selecciona una opción
+                </option>
+
+                <option value="Macho">
+                    Macho
+                </option>
+
+                <option value="Hembra">
+                    Hembra
+                </option>
+
+            </select>
+
+
+            <!-- WHATSAPP -->
+
+            <label for="whatsapp">
+                📱 WhatsApp del propietario
+            </label>
+
+            <input
+                type="tel"
+                id="whatsapp"
+                placeholder="Ejemplo: 59170000000"
+            >
+
+            <small>
+                Escribe el número con código de país,
+                sin el signo + ni espacios.
+            </small>
+
+
+            <!-- CLAVE -->
+
+            <label for="clave">
+                🔐 Clave privada del propietario
+            </label>
+
+            <input
+                type="password"
+                id="clave"
+                placeholder="Crea una clave privada"
+            >
+
+            <small>
+                Esta clave permitirá administrar
+                posteriormente el estado de la mascota.
+            </small>
+
+
+            <!-- ESTADO -->
+
+            <label for="estado">
+                Estado de la mascota
+            </label>
+
+            <select id="estado">
+
+                <option value="En casa">
+                    🏠 En casa
+                </option>
+
+                <option value="Perdida">
+                    🚨 Perdida
+                </option>
+
+                <option value="Encontrada">
+                    🔎 Encontrada
+                </option>
+
+            </select>
+
+
+            <!-- FOTO -->
+
+            <label for="foto">
+                📷 Foto de la mascota
+            </label>
+
+            <input
+                type="file"
+                id="foto"
+                accept="image/*"
+            >
+
+
+            <!-- GUARDAR -->
+
+            <button
+                id="guardarMascota"
+            >
+                Guardar mascota
             </button>
 
 
-            <div id="formulario" style="display: none;">
-
-                <h2>Registrar mascota</h2>
-
-
-                <input
-                    type="text"
-                    id="nombre"
-                    placeholder="Nombre de la mascota"
-                >
-
-
-                <input
-                    type="text"
-                    id="especie"
-                    placeholder="Perro, gato, etc."
-                >
-
-
-                <input
-                    type="text"
-                    id="raza"
-                    placeholder="Raza"
-                >
-
-
-                <input
-                    type="text"
-                    id="color"
-                    placeholder="Color"
-                >
-
-
-                <input
-                    type="text"
-                    id="sexo"
-                    placeholder="Sexo"
-                >
-
-
-                <!-- CLAVE PRIVADA DEL PROPIETARIO -->
-
-                <p>
-                    <strong>🔐 Clave privada del propietario</strong>
-                </p>
-
-                <input
-                    type="password"
-                    id="clave"
-                    placeholder="Crea una clave privada"
-                >
-
-                <p>
-                    <small>
-                        Esta clave permitirá cambiar posteriormente
-                        el estado de la mascota.
-                    </small>
-                </p>
-
-
-                <!-- ESTADO DE LA MASCOTA -->
-
-                <p>
-                    <strong>🐾 Estado de la mascota</strong>
-                </p>
-
-
-                <select id="estado">
-
-                    <option value="En casa">
-                        🏠 En casa
-                    </option>
-
-                    <option value="Perdida">
-                        🚨 Perdida
-                    </option>
-
-                    <option value="Encontrada">
-                        🔎 Encontrada
-                    </option>
-
-                </select>
-
-
-                <br>
-                <br>
-
-
-                <!-- FOTO -->
-
-                <p>
-                    <strong>📸 Foto de la mascota</strong>
-                </p>
-
-
-                <input
-                    type="file"
-                    id="foto"
-                    accept="image/*"
-                >
-
-
-                <br>
-                <br>
-
-
-                <button id="guardarMascota">
-                    Guardar mascota
-                </button>
-
-            </div>
-
         </section>
 
-
-        <section>
-
-            <h2>¿Cómo funciona?</h2>
-
-            <p>
-                1. Registra a tu mascota.
-            </p>
-
-            <p>
-                2. Crea una clave privada para administrar
-                su información.
-            </p>
-
-            <p>
-                3. Selecciona su estado actual.
-            </p>
-
-            <p>
-                4. Obtén su código QR único.
-            </p>
-
-            <p>
-                5. Coloca el código QR en su collar.
-            </p>
-
-            <p>
-                6. Si alguien encuentra a tu mascota,
-                puede escanear el código y consultar
-                su información.
-            </p>
-
-        </section>
 
     </main>
 
@@ -196,7 +411,7 @@
     <footer>
 
         <p>
-            © 2026 PETLINK - Conectando mascotas con sus familias 🐾
+            © 2026 PETLINK 🐾
         </p>
 
     </footer>
@@ -204,17 +419,12 @@
 
     <!-- FIREBASE -->
 
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
-
     <script>
 
         const firebaseConfig = {
 
             apiKey:
-                "AIzaSyCJk4zNh8inO4vJ33iZNblSxHuHzFTTmw",
+                "AIzaSyCJk4zNh8inO4vJ33i8ZNblSxHuHzFTTmw",
 
             authDomain:
                 "petlink-f16e2.firebaseapp.com",
@@ -233,10 +443,13 @@
 
             measurementId:
                 "G-BGET3HJRHC"
+
         };
 
 
-        firebase.initializeApp(firebaseConfig);
+        firebase.initializeApp(
+            firebaseConfig
+        );
 
 
         const db =
@@ -245,9 +458,10 @@
     </script>
 
 
-    <!-- CÓDIGO DE PETLINK -->
+    <!-- NUESTRO JAVASCRIPT -->
 
     <script src="script.js"></script>
+
 
 </body>
 
