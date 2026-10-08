@@ -20,9 +20,11 @@
         </p>
     </header>
 
+
     <main>
 
         <section>
+
             <h2>Protege a tu mascota</h2>
 
             <p>
@@ -32,13 +34,16 @@
                 y ayudarte a recuperarla.
             </p>
 
+
             <button id="btnRegistrar">
                 Registrar mascota
             </button>
 
+
             <div id="formulario" style="display: none;">
 
                 <h2>Registrar mascota</h2>
+
 
                 <input
                     type="text"
@@ -46,11 +51,13 @@
                     placeholder="Nombre de la mascota"
                 >
 
+
                 <input
                     type="text"
                     id="especie"
                     placeholder="Perro, gato, etc."
                 >
+
 
                 <input
                     type="text"
@@ -58,11 +65,13 @@
                     placeholder="Raza"
                 >
 
+
                 <input
                     type="text"
                     id="color"
                     placeholder="Color"
                 >
+
 
                 <input
                     type="text"
@@ -70,9 +79,40 @@
                     placeholder="Sexo"
                 >
 
+
+                <!-- ESTADO DE LA MASCOTA -->
+
+                <p>
+                    <strong>🐾 Estado de la mascota</strong>
+                </p>
+
+
+                <select id="estado">
+
+                    <option value="En casa">
+                        🏠 En casa
+                    </option>
+
+                    <option value="Perdida">
+                        🚨 Perdida
+                    </option>
+
+                    <option value="Encontrada">
+                        🔎 Encontrada
+                    </option>
+
+                </select>
+
+
+                <br><br>
+
+
+                <!-- FOTO -->
+
                 <p>
                     <strong>📸 Foto de la mascota</strong>
                 </p>
+
 
                 <input
                     type="file"
@@ -80,7 +120,9 @@
                     accept="image/*"
                 >
 
+
                 <br><br>
+
 
                 <button id="guardarMascota">
                     Guardar mascota
@@ -90,21 +132,36 @@
 
         </section>
 
+
         <section>
+
             <h2>¿Cómo funciona?</h2>
 
-            <p>1. Registra a tu mascota.</p>
-            <p>2. Obtén su código QR único.</p>
-            <p>3. Coloca el código QR en su collar.</p>
+            <p>
+                1. Registra a tu mascota.
+            </p>
 
             <p>
-                4. Si alguien encuentra a tu mascota,
-                puede escanear el código y contactarte.
+                2. Selecciona su estado actual.
+            </p>
+
+            <p>
+                3. Obtén su código QR único.
+            </p>
+
+            <p>
+                4. Coloca el código QR en su collar.
+            </p>
+
+            <p>
+                5. Si alguien encuentra a tu mascota,
+                puede escanear el código y consultar su información.
             </p>
 
         </section>
 
     </main>
+
 
     <footer>
 
@@ -120,6 +177,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
 
     <script>
 
