@@ -20,12 +20,28 @@ btnRegistrar.addEventListener("click", function () {
 
 guardarMascota.addEventListener("click", async function () {
 
-    const nombre = document.getElementById("nombre").value.trim();
-    const especie = document.getElementById("especie").value.trim();
-    const raza = document.getElementById("raza").value.trim();
-    const color = document.getElementById("color").value.trim();
-    const sexo = document.getElementById("sexo").value.trim();
+    const nombre =
+        document.getElementById("nombre").value.trim();
 
+    const especie =
+        document.getElementById("especie").value.trim();
+
+    const raza =
+        document.getElementById("raza").value.trim();
+
+    const color =
+        document.getElementById("color").value.trim();
+
+    const sexo =
+        document.getElementById("sexo").value.trim();
+
+    const foto =
+        document.getElementById("foto").files[0];
+
+
+    // -----------------------------------------
+    // COMPROBAR DATOS
+    // -----------------------------------------
 
     if (
         nombre === "" ||
@@ -42,22 +58,108 @@ guardarMascota.addEventListener("click", async function () {
     }
 
 
-    const idMascota = "PET-" + Date.now();
+    // -----------------------------------------
+    // COMPROBAR FOTO
+    // -----------------------------------------
+
+    if (!foto) {
+
+        alert("Por favor, selecciona una foto de la mascota.");
+
+        return;
+
+    }
 
 
-    const mascota = {
+    // -----------------------------------------
+    // COMPROBAR TIPO DE FOTO
+    // -----------------------------------------
 
-        id: idMascota,
-        nombre: nombre,
-        especie: especie,
-        raza: raza,
-        color: color,
-        sexo: sexo
+    if (!foto.type.startsWith("image/")) {
 
-    };
+        alert("El archivo seleccionado debe ser una imagen.");
+
+        return;
+
+    }
+
+
+    // -----------------------------------------
+    // COMPROBAR TAMAÑO
+    // Máximo 5 MB
+    // -----------------------------------------
+
+    if (foto.size > 5 * 1024 * 1024) {
+
+        alert("La foto no debe superar los 5 MB.");
+
+        return;
+
+    }
+
+
+    // -----------------------------------------
+    // CREAR ID DE MASCOTA
+    // -----------------------------------------
+
+    const idMascota =
+        "PET-" + Date.now();
 
 
     try {
+
+        // -----------------------------------------
+        // SUBIR FOTO A FIREBASE STORAGE
+        // -----------------------------------------
+
+        const referenciaFoto =
+            storage
+                .ref()
+                .child(
+                    "mascotas/" +
+                    idMascota +
+                    "/" +
+                    foto.name
+                );
+
+
+        await referenciaFoto.put(foto);
+
+
+        // -----------------------------------------
+        // OBTENER URL DE LA FOTO
+        // -----------------------------------------
+
+        const urlFoto =
+            await referenciaFoto.getDownloadURL();
+
+
+        // -----------------------------------------
+        // CREAR DATOS DE LA MASCOTA
+        // -----------------------------------------
+
+        const mascota = {
+
+            id: idMascota,
+
+            nombre: nombre,
+
+            especie: especie,
+
+            raza: raza,
+
+            color: color,
+
+            sexo: sexo,
+
+            foto: urlFoto
+
+        };
+
+
+        // -----------------------------------------
+        // GUARDAR EN FIRESTORE
+        // -----------------------------------------
 
         await db
             .collection("mascotas")
@@ -65,12 +167,20 @@ guardarMascota.addEventListener("click", async function () {
             .set(mascota);
 
 
+        // -----------------------------------------
+        // CREAR LINK DEL PERFIL
+        // -----------------------------------------
+
         const urlPerfil =
             window.location.origin +
             window.location.pathname +
             "?id=" +
             encodeURIComponent(idMascota);
 
+
+        // -----------------------------------------
+        // CREAR ZONA DEL QR
+        // -----------------------------------------
 
         let zonaQR =
             document.getElementById("zonaQR");
@@ -90,6 +200,10 @@ guardarMascota.addEventListener("click", async function () {
         }
 
 
+        // -----------------------------------------
+        // MOSTRAR RESULTADO
+        // -----------------------------------------
+
         zonaQR.innerHTML = `
 
             <h2>🐾 Mascota registrada</h2>
@@ -103,6 +217,22 @@ guardarMascota.addEventListener("click", async function () {
                 <strong>Código PETLINK:</strong>
                 ${idMascota}
             </p>
+
+            <p>
+                <strong>Foto:</strong>
+            </p>
+
+            <img
+                src="${urlFoto}"
+                alt="Foto de ${nombre}"
+                style="
+                    width: 220px;
+                    max-width: 100%;
+                    border-radius: 12px;
+                    display: block;
+                    margin: 10px auto;
+                "
+            >
 
             <p>
                 <strong>Enlace del perfil:</strong>
@@ -123,6 +253,10 @@ guardarMascota.addEventListener("click", async function () {
 
         `;
 
+
+        // -----------------------------------------
+        // CARGAR GENERADOR QR
+        // -----------------------------------------
 
         const qrScript =
             document.createElement("script");
@@ -157,6 +291,10 @@ guardarMascota.addEventListener("click", async function () {
         document.head.appendChild(qrScript);
 
 
+        // -----------------------------------------
+        // MENSAJE DE ÉXITO
+        // -----------------------------------------
+
         alert(
             "¡Mascota registrada correctamente! 🐾\n\n" +
             "Código PETLINK: " +
@@ -169,10 +307,10 @@ guardarMascota.addEventListener("click", async function () {
         console.error(error);
 
         alert(
-             "ERROR DE FIREBASE:\n\n" +
-        error.code +
-        "\n\n" +
-        error.message
+            "ERROR AL GUARDAR LA MASCOTA:\n\n" +
+            error.code +
+            "\n\n" +
+            error.message
         );
 
     }
@@ -264,6 +402,27 @@ function mostrarPerfil(mascota) {
         <main>
 
             <section>
+
+                ${
+                    mascota.foto
+                    ?
+                    `
+                    <img
+                        src="${mascota.foto}"
+                        alt="Foto de ${mascota.nombre}"
+                        style="
+                            width: 250px;
+                            max-width: 100%;
+                            border-radius: 15px;
+                            display: block;
+                            margin: 20px auto;
+                        "
+                    >
+                    `
+                    :
+                    ""
+                }
+
 
                 <h2>
                     🐶 ${mascota.nombre}
