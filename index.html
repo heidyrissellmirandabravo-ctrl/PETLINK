@@ -13,11 +13,13 @@
 <body>
 
     <header>
+
         <h1>🐾 PETLINK</h1>
 
         <p>
             Identificación y recuperación de mascotas
         </p>
+
     </header>
 
 
@@ -80,6 +82,26 @@
                 >
 
 
+                <!-- CLAVE PRIVADA DEL PROPIETARIO -->
+
+                <p>
+                    <strong>🔐 Clave privada del propietario</strong>
+                </p>
+
+                <input
+                    type="password"
+                    id="clave"
+                    placeholder="Crea una clave privada"
+                >
+
+                <p>
+                    <small>
+                        Esta clave permitirá cambiar posteriormente
+                        el estado de la mascota.
+                    </small>
+                </p>
+
+
                 <!-- ESTADO DE LA MASCOTA -->
 
                 <p>
@@ -104,7 +126,8 @@
                 </select>
 
 
-                <br><br>
+                <br>
+                <br>
 
 
                 <!-- FOTO -->
@@ -121,7 +144,8 @@
                 >
 
 
-                <br><br>
+                <br>
+                <br>
 
 
                 <button id="guardarMascota">
@@ -142,20 +166,26 @@
             </p>
 
             <p>
-                2. Selecciona su estado actual.
+                2. Crea una clave privada para administrar
+                su información.
             </p>
 
             <p>
-                3. Obtén su código QR único.
+                3. Selecciona su estado actual.
             </p>
 
             <p>
-                4. Coloca el código QR en su collar.
+                4. Obtén su código QR único.
             </p>
 
             <p>
-                5. Si alguien encuentra a tu mascota,
-                puede escanear el código y consultar su información.
+                5. Coloca el código QR en su collar.
+            </p>
+
+            <p>
+                6. Si alguien encuentra a tu mascota,
+                puede escanear el código y consultar
+                su información.
             </p>
 
         </section>
@@ -183,27 +213,34 @@
 
         const firebaseConfig = {
 
-            apiKey: "AIzaSyCJk4zNh8inO4vJ33iZNblSxHuHzFTTmw",
+            apiKey:
+                "AIzaSyCJk4zNh8inO4vJ33iZNblSxHuHzFTTmw",
 
-            authDomain: "petlink-f16e2.firebaseapp.com",
+            authDomain:
+                "petlink-f16e2.firebaseapp.com",
 
-            projectId: "petlink-f16e2",
+            projectId:
+                "petlink-f16e2",
 
-            storageBucket: "petlink-f16e2.firebasestorage.app",
+            storageBucket:
+                "petlink-f16e2.firebasestorage.app",
 
-            messagingSenderId: "898636920537",
+            messagingSenderId:
+                "898636920537",
 
-            appId: "1:898636920537:web:f5bc945291877d8821b0c8",
+            appId:
+                "1:898636920537:web:f5bc945291877d8821b0c8",
 
-            measurementId: "G-BGET3HJRHC"
-
+            measurementId:
+                "G-BGET3HJRHC"
         };
 
 
         firebase.initializeApp(firebaseConfig);
 
 
-        const db = firebase.firestore();
+        const db =
+            firebase.firestore();
 
     </script>
 
