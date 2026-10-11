@@ -16,6 +16,188 @@ if (typeof db === "undefined") {
     console.error("Firebase no está inicializado. Revisa index.html.");
 }
 
+// Cargar la biblioteca QR una sola vez
+let promesaCargaQR = null;
+
+function cargarBibliotecaQR() {
+    if (typeof QRCode !== "undefined") {
+        return Promise.resolve();
+    }
+
+    if (promesaCargaQR) {
+        return promesaCargaQR;
+    }
+
+    promesaCargaQR = new Promise((resolve, reject) => {
+        const script = document.createElement("script");
+
+        script.src =
+            "https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js";
+
+        script.onload = () => {
+            if (typeof QRCode !== "undefined") {
+                resolve();
+            } else {
+                promesaCargaQR = null;
+                reject(new Error("No se pudo iniciar el generador QR."));
+            }
+        };
+
+        script.onerror = () => {
+            promesaCargaQR = null;
+            reject(new Error("No se pudo cargar la biblioteca QR."));
+        };
+
+        document.head.appendChild(script);
+    });
+
+    return promesaCargaQR;
+}
+
+// Generar el QR correspondiente a una mascota
+async function generarCodigoQR(contenedor, url, tamano = 200) {
+    contenedor.innerHTML = "";
+
+    try {
+        await cargarBibliotecaQR();
+
+        contenedor.innerHTML = "";
+
+        new QRCode(contenedor, {
+            text: url,
+            width: tamano,
+            height: tamano,
+            correctLevel: QRCode.CorrectLevel.H
+        });
+    } catch (error) {
+        console.error("Error al generar el QR:", error);
+
+        crearElemento(
+            "p",
+            "No se pudo cargar el QR. Comprueba tu conexión e inténtalo nuevamente.",
+            contenedor
+        );
+    }
+}
+
+// Crear el enlace del perfil de una mascota
+function obtenerURLPerfil(idMascota) {
+    const url = new URL(window.location.href);
+    url.search = "";
+    url.searchParams.set("id", idMascota);
+    return url.href;
+}
+
+// Imprimir el QR de una mascota
+async function imprimirCodigoQR(contenedorQR, idMascota, nombreMascota) {
+    try {
+        await cargarBibliotecaQR();
+
+        let canvas = contenedorQR.querySelector("canvas");
+
+        if (!canvas) {
+            const imagenQR = contenedorQR.querySelector("img");
+
+            if (imagenQR && imagenQR.complete) {
+                const canvasTemporal = document.createElement("canvas");
+                canvasTemporal.width = imagenQR.naturalWidth;
+                canvasTemporal.height = imagenQR.naturalHeight;
+
+                const contexto = canvasTemporal.getContext("2d");
+                contexto.drawImage(imagenQR, 0, 0);
+
+                canvas = canvasTemporal;
+            }
+        }
+
+        if (!canvas) {
+            alert("Espera a que aparezca el QR antes de imprimirlo.");
+            return;
+        }
+
+        const imagenImprimible = canvas.toDataURL("image/png");
+        const ventana = window.open("", "_blank");
+
+        if (!ventana) {
+            alert(
+                "El navegador bloqueó la ventana de impresión. Permite las ventanas emergentes e inténtalo de nuevo."
+            );
+            return;
+        }
+
+        ventana.document.write(`
+            <!DOCTYPE html>
+            <html lang="es">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>QR PETLINK - ${escaparHTML(nombreMascota)}</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        text-align: center;
+                        padding: 30px;
+                        color: #222;
+                    }
+
+                    h1 {
+                        margin-bottom: 8px;
+                    }
+
+                    img {
+                        width: 260px;
+                        height: 260px;
+                        max-width: 90%;
+                        image-rendering: pixelated;
+                    }
+
+                    .codigo {
+                        font-weight: bold;
+                        margin-top: 12px;
+                    }
+
+                    @media print {
+                        body {
+                            padding: 10px;
+                        }
+                    }
+                </style>
+            </head>
+            <body>
+                <h1>PETLINK</h1>
+                <h2>${escaparHTML(nombreMascota)}</h2>
+                <p>Escanea este código para consultar el perfil de la mascota.</p>
+                <img src="${imagenImprimible}" alt="Código QR de PETLINK">
+                <p class="codigo">Código: ${escaparHTML(idMascota)}</p>
+                <script>
+                    window.onload = function () {
+                        setTimeout(function () {
+                            window.print();
+                        }, 300);
+                    };
+                <\/script>
+            </body>
+            </html>
+        `);
+
+        ventana.document.close();
+    } catch (error) {
+        console.error(error);
+        alert("No se pudo preparar el QR para imprimir.");
+    }
+}
+
+// Evitar interpretar como HTML los datos de texto
+function escaparHTML(texto) {
+    return String(texto ?? "").replace(/[&<>"']/g, caracter => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[caracter]);
+}
+
 // Navegación de la página principal
 btnRegistrar.addEventListener("click", function () {
     inicio.hidden = true;
@@ -182,9 +364,7 @@ guardarMascota.addEventListener("click", async function () {
 
         await db.collection("mascotas").doc(id).set(mascota);
 
-        const urlPerfil = new URL(window.location.href);
-        urlPerfil.search = "";
-        urlPerfil.searchParams.set("id", id);
+        const urlPerfil = obtenerURLPerfil(id);
 
         let zonaQR = document.getElementById("zonaQR");
 
@@ -200,50 +380,27 @@ guardarMascota.addEventListener("click", async function () {
         crearElemento("p", "Código PETLINK: " + id, zonaQR);
 
         const enlace = document.createElement("a");
-        enlace.href = urlPerfil.href;
+        enlace.href = urlPerfil;
         enlace.textContent = "Abrir perfil de la mascota";
         enlace.target = "_blank";
         enlace.rel = "noopener noreferrer";
         zonaQR.appendChild(enlace);
 
         const espacioQR = document.createElement("div");
-        espacioQR.id = "codigoQR";
         espacioQR.style.marginTop = "15px";
         zonaQR.appendChild(espacioQR);
 
-        // Cargar la biblioteca QR sin añadirla varias veces
-        function generarQR() {
-            if (typeof QRCode === "undefined") {
-                alert(
-                    "La mascota se guardó, pero no se pudo generar el QR. Puedes abrir el enlace del perfil."
-                );
-                return;
-            }
+        await generarCodigoQR(espacioQR, urlPerfil, 200);
 
-            new QRCode(espacioQR, {
-                text: urlPerfil.href,
-                width: 200,
-                height: 200
-            });
-        }
+        const botonImprimir = crearBoton(
+            "🖨️ Imprimir código QR",
+            function () {
+                imprimirCodigoQR(espacioQR, id, nombre);
+            },
+            zonaQR
+        );
 
-        if (typeof QRCode !== "undefined") {
-            generarQR();
-        } else {
-            const qrScript = document.createElement("script");
-            qrScript.src =
-                "https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js";
-
-            qrScript.onload = generarQR;
-
-            qrScript.onerror = function () {
-                alert(
-                    "La mascota se guardó, pero no se pudo cargar el generador QR. Puedes abrir el enlace del perfil."
-                );
-            };
-
-            document.head.appendChild(qrScript);
-        }
+        botonImprimir.style.marginTop = "12px";
 
         alert("¡Mascota registrada correctamente!\nCódigo: " + id);
     } catch (error) {
@@ -274,7 +431,6 @@ formBusqueda.addEventListener("submit", async function (evento) {
     botonBuscar.textContent = "Buscando...";
 
     try {
-        // Leer los registros de la colección de mascotas
         const consulta = await db.collection("mascotas").get();
 
         const normalizar = texto =>
@@ -286,8 +442,6 @@ formBusqueda.addEventListener("submit", async function (evento) {
 
         const termino = normalizar(nombreBuscado);
 
-        // Encontrar todos los nombres coincidentes,
-        // sin distinguir mayúsculas, minúsculas ni tildes
         const coincidencias = consulta.docs
             .map(documento => ({
                 ...documento.data(),
@@ -318,7 +472,7 @@ formBusqueda.addEventListener("submit", async function (evento) {
         resultadosBusqueda.appendChild(indicacion);
 
         // Mostrar una tarjeta por cada mascota encontrada
-        coincidencias.forEach(mascota => {
+        for (const mascota of coincidencias) {
             const tarjeta = document.createElement("article");
             tarjeta.className = "tarjeta-mascota";
 
@@ -337,21 +491,25 @@ formBusqueda.addEventListener("submit", async function (evento) {
             }
 
             crearElemento("h3", mascota.nombre || "Sin nombre", tarjeta);
+
             crearElemento(
                 "p",
                 "Especie: " + (mascota.especie || "No indicada"),
                 tarjeta
             );
+
             crearElemento(
                 "p",
                 "Raza: " + (mascota.raza || "No indicada"),
                 tarjeta
             );
+
             crearElemento(
                 "p",
                 "Color: " + (mascota.color || "No indicado"),
                 tarjeta
             );
+
             crearElemento(
                 "p",
                 "Sexo: " + (mascota.sexo || "No indicado"),
@@ -374,22 +532,54 @@ formBusqueda.addEventListener("submit", async function (evento) {
                     "background:#fff3cd;color:#664d03;padding:10px;border-radius:8px;font-weight:bold;";
             }
 
+            // NUEVO: mostrar el QR original de esta mascota en el resultado
+            crearElemento("h4", "Código QR de esta mascota", tarjeta);
+
+            const contenedorQR = document.createElement("div");
+            contenedorQR.className = "qr-mascota";
+            contenedorQR.style.cssText =
+                "background:white;padding:12px;margin:10px auto;text-align:center;width:max-content;max-width:100%;border-radius:8px;";
+
+            tarjeta.appendChild(contenedorQR);
+
+            const urlPerfil = obtenerURLPerfil(mascota.id);
+
+            await generarCodigoQR(contenedorQR, urlPerfil, 180);
+
+            const botonImprimirQR = crearBoton(
+                "🖨️ Imprimir QR",
+                function () {
+                    imprimirCodigoQR(
+                        contenedorQR,
+                        mascota.id,
+                        mascota.nombre || "Mascota"
+                    );
+                },
+                tarjeta
+            );
+
+            botonImprimirQR.style.marginBottom = "12px";
+
+            crearElemento(
+                "p",
+                "Código PETLINK: " + mascota.id,
+                tarjeta
+            );
+
             crearBoton(
                 "Ver perfil de esta mascota",
                 function () {
-                    const url = new URL(window.location.href);
-                    url.search = "";
-                    url.searchParams.set("id", mascota.id);
-                    window.location.href = url.href;
+                    window.location.href = obtenerURLPerfil(mascota.id);
                 },
                 tarjeta
             );
 
             resultadosBusqueda.appendChild(tarjeta);
-        });
+        }
 
     } catch (error) {
         console.error(error);
+
         mostrarMensajeBusqueda(
             "Ocurrió un problema al buscar en Firebase. Comprueba tu conexión e inténtalo otra vez."
         );
@@ -470,6 +660,7 @@ function mostrarPerfil(mascota) {
     crearElemento("p", "Código PETLINK: " + mascota.id, tarjeta);
     crearElemento("hr", "", tarjeta);
     crearElemento("h3", "¿Encontraste esta mascota?", tarjeta);
+
     crearElemento(
         "p",
         "Puedes comunicarte con su propietario para coordinar la devolución.",
@@ -578,6 +769,7 @@ function abrirPanelPropietario(mascota) {
 
     crearElemento("h2", "Administrar a " + mascota.nombre, tarjeta);
     crearElemento("p", "Código PETLINK: " + mascota.id, tarjeta);
+
     crearElemento(
         "p",
         "El código QR y el identificador se conservarán.",
@@ -599,6 +791,7 @@ function abrirPanelPropietario(mascota) {
         input.required = true;
         input.style.cssText =
             "width:100%;box-sizing:border-box;padding:10px;margin:6px 0 12px;";
+
         formularioEdicion.appendChild(input);
         return input;
     }
@@ -669,11 +862,13 @@ function abrirPanelPropietario(mascota) {
         fotoActual.alt = "Fotografía actual de la mascota";
         fotoActual.style.cssText =
             "width:150px;max-width:100%;border-radius:12px;";
+
         formularioEdicion.appendChild(fotoActual);
     }
 
     crearElemento("hr", "", formularioEdicion);
     crearElemento("h3", "🔐 Cambiar clave privada (opcional)", formularioEdicion);
+
     crearElemento(
         "p",
         "Si no quieres cambiar la clave, deja los tres campos vacíos.",
@@ -689,6 +884,7 @@ function abrirPanelPropietario(mascota) {
         input.setAttribute("aria-label", etiqueta);
         input.style.cssText =
             "width:100%;box-sizing:border-box;padding:10px;margin:6px 0 12px;";
+
         formularioEdicion.appendChild(input);
         return input;
     }
@@ -809,7 +1005,8 @@ function abrirPanelPropietario(mascota) {
             }
 
             const mascotaActualizada = documentoActualizado.data();
-            mascotaActualizada.id = mascotaActualizada.id || documentoActualizado.id;
+            mascotaActualizada.id =
+                mascotaActualizada.id || documentoActualizado.id;
 
             alert(
                 intentaCambiarClave
@@ -862,6 +1059,7 @@ function mostrarMascotaNoEncontrada() {
 
     crearElemento("h1", "🐾 PETLINK", tarjeta);
     crearElemento("h2", "Mascota no encontrada", tarjeta);
+
     crearElemento(
         "p",
         "No encontramos información asociada a este código PETLINK.",
