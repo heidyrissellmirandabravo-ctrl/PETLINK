@@ -11,25 +11,43 @@ const mensajeBusqueda = document.getElementById("mensajeBusqueda");
 const volverInicio = document.getElementById("volverInicio");
 const volverDesdeRegistro = document.getElementById("volverDesdeRegistro");
 
+// Comprobar que Firebase esté disponible
+if (typeof db === "undefined") {
+    console.error("Firebase no está inicializado. Revisa index.html.");
+}
+
 // Navegación de la página principal
 btnRegistrar.addEventListener("click", function () {
     inicio.hidden = true;
+    zonaBusqueda.hidden = true;
+    zonaBusqueda.style.display = "none";
     formulario.hidden = false;
     formulario.style.display = "block";
-    zonaBusqueda.hidden = true;
 });
 
 btnBuscarMascota.addEventListener("click", function () {
-    zonaBusqueda.hidden = false;
     formulario.hidden = true;
     formulario.style.display = "none";
+
+    zonaBusqueda.hidden = false;
+    zonaBusqueda.style.display = "block";
+
+    mensajeBusqueda.hidden = true;
+    resultadosBusqueda.innerHTML = "";
+
     buscarNombre.focus();
 });
 
 volverInicio.addEventListener("click", function () {
     zonaBusqueda.hidden = true;
+    zonaBusqueda.style.display = "none";
+
     resultadosBusqueda.innerHTML = "";
     mensajeBusqueda.hidden = true;
+    buscarNombre.value = "";
+
+    formulario.hidden = true;
+    formulario.style.display = "none";
     inicio.hidden = false;
 });
 
@@ -65,14 +83,14 @@ function comprimirFoto(archivo) {
                 canvas.width = ancho;
                 canvas.height = alto;
 
-                canvas.getContext("2d").drawImage(
-                    imagen,
-                    0,
-                    0,
-                    ancho,
-                    alto
-                );
+                const contexto = canvas.getContext("2d");
 
+                if (!contexto) {
+                    reject(new Error("No se pudo procesar la fotografía."));
+                    return;
+                }
+
+                contexto.drawImage(imagen, 0, 0, ancho, alto);
                 resolve(canvas.toDataURL("image/jpeg", 0.7));
             };
 
@@ -193,25 +211,39 @@ guardarMascota.addEventListener("click", async function () {
         espacioQR.style.marginTop = "15px";
         zonaQR.appendChild(espacioQR);
 
-        const qrScript = document.createElement("script");
-        qrScript.src =
-            "https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js";
+        // Cargar la biblioteca QR sin añadirla varias veces
+        function generarQR() {
+            if (typeof QRCode === "undefined") {
+                alert(
+                    "La mascota se guardó, pero no se pudo generar el QR. Puedes abrir el enlace del perfil."
+                );
+                return;
+            }
 
-        qrScript.onload = function () {
             new QRCode(espacioQR, {
                 text: urlPerfil.href,
                 width: 200,
                 height: 200
             });
-        };
+        }
 
-        qrScript.onerror = function () {
-            alert(
-                "La mascota se guardó, pero no se pudo cargar el generador QR. Puedes abrir el enlace del perfil."
-            );
-        };
+        if (typeof QRCode !== "undefined") {
+            generarQR();
+        } else {
+            const qrScript = document.createElement("script");
+            qrScript.src =
+                "https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js";
 
-        document.head.appendChild(qrScript);
+            qrScript.onload = generarQR;
+
+            qrScript.onerror = function () {
+                alert(
+                    "La mascota se guardó, pero no se pudo cargar el generador QR. Puedes abrir el enlace del perfil."
+                );
+            };
+
+            document.head.appendChild(qrScript);
+        }
 
         alert("¡Mascota registrada correctamente!\nCódigo: " + id);
     } catch (error) {
@@ -242,7 +274,7 @@ formBusqueda.addEventListener("submit", async function (evento) {
     botonBuscar.textContent = "Buscando...";
 
     try {
-        // Leer los registros de la colección de mascotas.
+        // Leer los registros de la colección de mascotas
         const consulta = await db.collection("mascotas").get();
 
         const normalizar = texto =>
@@ -254,8 +286,8 @@ formBusqueda.addEventListener("submit", async function (evento) {
 
         const termino = normalizar(nombreBuscado);
 
-        // Mostrar todos los registros cuyo nombre coincida,
-        // sin distinguir mayúsculas, minúsculas ni tildes.
+        // Encontrar todos los nombres coincidentes,
+        // sin distinguir mayúsculas, minúsculas ni tildes
         const coincidencias = consulta.docs
             .map(documento => ({
                 ...documento.data(),
@@ -285,7 +317,7 @@ formBusqueda.addEventListener("submit", async function (evento) {
             "Revisa las fotografías y los datos para identificar a la mascota correcta.";
         resultadosBusqueda.appendChild(indicacion);
 
-        // Crear una tarjeta para cada coincidencia.
+        // Mostrar una tarjeta por cada mascota encontrada
         coincidencias.forEach(mascota => {
             const tarjeta = document.createElement("article");
             tarjeta.className = "tarjeta-mascota";
@@ -305,12 +337,29 @@ formBusqueda.addEventListener("submit", async function (evento) {
             }
 
             crearElemento("h3", mascota.nombre || "Sin nombre", tarjeta);
-            crearElemento("p", "Especie: " + (mascota.especie || "No indicada"), tarjeta);
-            crearElemento("p", "Raza: " + (mascota.raza || "No indicada"), tarjeta);
-            crearElemento("p", "Color: " + (mascota.color || "No indicado"), tarjeta);
-            crearElemento("p", "Sexo: " + (mascota.sexo || "No indicado"), tarjeta);
+            crearElemento(
+                "p",
+                "Especie: " + (mascota.especie || "No indicada"),
+                tarjeta
+            );
+            crearElemento(
+                "p",
+                "Raza: " + (mascota.raza || "No indicada"),
+                tarjeta
+            );
+            crearElemento(
+                "p",
+                "Color: " + (mascota.color || "No indicado"),
+                tarjeta
+            );
+            crearElemento(
+                "p",
+                "Sexo: " + (mascota.sexo || "No indicado"),
+                tarjeta
+            );
 
             const estado = mascota.estado || "En casa";
+
             const estadoElemento = crearElemento(
                 "p",
                 "Estado: " + estado,
@@ -325,12 +374,16 @@ formBusqueda.addEventListener("submit", async function (evento) {
                     "background:#fff3cd;color:#664d03;padding:10px;border-radius:8px;font-weight:bold;";
             }
 
-            crearBoton("Ver perfil de esta mascota", function () {
-                const url = new URL(window.location.href);
-                url.search = "";
-                url.searchParams.set("id", mascota.id);
-                window.location.href = url.href;
-            }, tarjeta);
+            crearBoton(
+                "Ver perfil de esta mascota",
+                function () {
+                    const url = new URL(window.location.href);
+                    url.search = "";
+                    url.searchParams.set("id", mascota.id);
+                    window.location.href = url.href;
+                },
+                tarjeta
+            );
 
             resultadosBusqueda.appendChild(tarjeta);
         });
@@ -391,17 +444,17 @@ function mostrarPerfil(mascota) {
     if (mascota.foto) {
         const foto = document.createElement("img");
         foto.src = mascota.foto;
-        foto.alt = "Fotografía de " + mascota.nombre;
+        foto.alt = "Fotografía de " + (mascota.nombre || "la mascota");
         foto.style.cssText =
             "width:250px;max-width:100%;border-radius:15px;display:block;margin:20px auto;";
         tarjeta.appendChild(foto);
     }
 
-    crearElemento("h2", "🐾 " + mascota.nombre, tarjeta);
-    crearElemento("p", "Especie: " + mascota.especie, tarjeta);
-    crearElemento("p", "Raza: " + mascota.raza, tarjeta);
-    crearElemento("p", "Color: " + mascota.color, tarjeta);
-    crearElemento("p", "Sexo: " + mascota.sexo, tarjeta);
+    crearElemento("h2", "🐾 " + (mascota.nombre || "Mascota"), tarjeta);
+    crearElemento("p", "Especie: " + (mascota.especie || "No indicada"), tarjeta);
+    crearElemento("p", "Raza: " + (mascota.raza || "No indicada"), tarjeta);
+    crearElemento("p", "Color: " + (mascota.color || "No indicado"), tarjeta);
+    crearElemento("p", "Sexo: " + (mascota.sexo || "No indicado"), tarjeta);
 
     const estado = mascota.estado || "En casa";
     const estadoTexto = crearElemento("h3", "Estado: " + estado, tarjeta);
@@ -423,22 +476,34 @@ function mostrarPerfil(mascota) {
         tarjeta
     );
 
-    crearBoton("💬 Contactar al dueño por WhatsApp", function () {
-        contactarWhatsApp(mascota.whatsapp, mascota.nombre);
-    }, tarjeta);
+    crearBoton(
+        "💬 Contactar al dueño por WhatsApp",
+        function () {
+            contactarWhatsApp(mascota.whatsapp, mascota.nombre);
+        },
+        tarjeta
+    );
 
     crearElemento("hr", "", tarjeta);
     crearElemento("h3", "🔐 Administración del propietario", tarjeta);
 
-    crearBoton("Administrar mascota", function () {
-        abrirAdministracion(mascota.id);
-    }, tarjeta);
+    crearBoton(
+        "Administrar mascota",
+        function () {
+            abrirAdministracion(mascota.id);
+        },
+        tarjeta
+    );
 
-    crearBoton("Volver a PETLINK", function () {
-        const url = new URL(window.location.href);
-        url.search = "";
-        window.location.href = url.href;
-    }, tarjeta);
+    crearBoton(
+        "Volver a PETLINK",
+        function () {
+            const url = new URL(window.location.href);
+            url.search = "";
+            window.location.href = url.href;
+        },
+        tarjeta
+    );
 
     principal.appendChild(tarjeta);
     document.body.appendChild(principal);
@@ -454,7 +519,9 @@ async function buscarMascota(id) {
         const documento = await db.collection("mascotas").doc(id).get();
 
         if (documento.exists) {
-            mostrarPerfil(documento.data());
+            const mascota = documento.data();
+            mascota.id = mascota.id || documento.id;
+            mostrarPerfil(mascota);
         } else {
             mostrarMascotaNoEncontrada();
         }
@@ -483,6 +550,7 @@ async function verificarClave(idMascota, claveIngresada) {
         }
 
         const mascota = documento.data();
+        mascota.id = mascota.id || documento.id;
 
         if (mascota.clave !== claveIngresada) {
             alert("Clave incorrecta.");
@@ -510,7 +578,11 @@ function abrirPanelPropietario(mascota) {
 
     crearElemento("h2", "Administrar a " + mascota.nombre, tarjeta);
     crearElemento("p", "Código PETLINK: " + mascota.id, tarjeta);
-    crearElemento("p", "El código QR y el identificador se conservarán.", tarjeta);
+    crearElemento(
+        "p",
+        "El código QR y el identificador se conservarán.",
+        tarjeta
+    );
 
     const formularioEdicion = document.createElement("form");
     formularioEdicion.id = "editarMascotaForm";
@@ -540,6 +612,7 @@ function abrirPanelPropietario(mascota) {
 
     const sexo = document.createElement("select");
     sexo.id = "editarSexo";
+    sexo.required = true;
     sexo.style.cssText = "width:100%;padding:10px;margin:6px 0 12px;";
 
     ["Macho", "Hembra"].forEach(opcion => {
@@ -736,6 +809,7 @@ function abrirPanelPropietario(mascota) {
             }
 
             const mascotaActualizada = documentoActualizado.data();
+            mascotaActualizada.id = mascotaActualizada.id || documentoActualizado.id;
 
             alert(
                 intentaCambiarClave
@@ -794,11 +868,15 @@ function mostrarMascotaNoEncontrada() {
         tarjeta
     );
 
-    crearBoton("Volver a PETLINK", function () {
-        const url = new URL(window.location.href);
-        url.search = "";
-        window.location.href = url.href;
-    }, tarjeta);
+    crearBoton(
+        "Volver a PETLINK",
+        function () {
+            const url = new URL(window.location.href);
+            url.search = "";
+            window.location.href = url.href;
+        },
+        tarjeta
+    );
 
     principal.appendChild(tarjeta);
     document.body.appendChild(principal);
