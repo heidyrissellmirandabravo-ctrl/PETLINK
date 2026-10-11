@@ -127,13 +127,8 @@ guardarMascota.addEventListener("click", async function () {
 
         zonaQR.innerHTML = "";
 
-        const titulo = document.createElement("h2");
-        titulo.textContent = "🐾 ¡Mascota registrada!";
-        zonaQR.appendChild(titulo);
-
-        const codigo = document.createElement("p");
-        codigo.textContent = "Código PETLINK: " + id;
-        zonaQR.appendChild(codigo);
+        crearElemento("h2", "🐾 ¡Mascota registrada!", zonaQR);
+        crearElemento("p", "Código PETLINK: " + id, zonaQR);
 
         const enlace = document.createElement("a");
         enlace.href = urlPerfil.href;
@@ -305,7 +300,7 @@ async function verificarClave(idMascota, claveIngresada) {
     }
 }
 
-// Panel del propietario: editar datos, cambiar estado y cambiar clave
+// Panel unificado: editar datos y cambiar clave con un solo botón
 function abrirPanelPropietario(mascota) {
     document.body.innerHTML = "";
 
@@ -316,17 +311,18 @@ function abrirPanelPropietario(mascota) {
 
     const principal = document.createElement("main");
     const tarjeta = document.createElement("section");
+
     crearElemento("h2", "Administrar a " + mascota.nombre, tarjeta);
     crearElemento("p", "Código PETLINK: " + mascota.id, tarjeta);
-    crearElemento("p", "El código QR y el identificador no cambiarán al editar los datos.", tarjeta);
+    crearElemento("p", "El código QR y el identificador se conservarán.", tarjeta);
 
-    crearElemento("h3", "✏️ Editar información", tarjeta);
+    const formularioEdicion = document.createElement("form");
+    formularioEdicion.id = "editarMascotaForm";
 
-    const formulario = document.createElement("form");
-    formulario.id = "editarMascotaForm";
+    crearElemento("h3", "✏️ Datos de la mascota", formularioEdicion);
 
     function campo(etiqueta, id, valor, tipo = "text") {
-        crearElemento("label", etiqueta, formulario).htmlFor = id;
+        crearElemento("label", etiqueta, formularioEdicion).htmlFor = id;
 
         const input = document.createElement("input");
         input.id = id;
@@ -334,7 +330,7 @@ function abrirPanelPropietario(mascota) {
         input.value = valor || "";
         input.required = true;
         input.style.cssText = "width:100%;box-sizing:border-box;padding:10px;margin:6px 0 12px;";
-        formulario.appendChild(input);
+        formularioEdicion.appendChild(input);
         return input;
     }
 
@@ -343,7 +339,7 @@ function abrirPanelPropietario(mascota) {
     campo("Raza", "editarRaza", mascota.raza);
     campo("Color", "editarColor", mascota.color);
 
-    crearElemento("label", "Sexo", formulario).htmlFor = "editarSexo";
+    crearElemento("label", "Sexo", formularioEdicion).htmlFor = "editarSexo";
 
     const sexo = document.createElement("select");
     sexo.id = "editarSexo";
@@ -357,11 +353,11 @@ function abrirPanelPropietario(mascota) {
     });
 
     sexo.value = mascota.sexo || "Macho";
-    formulario.appendChild(sexo);
+    formularioEdicion.appendChild(sexo);
 
     campo("WhatsApp con código de país, solo números", "editarWhatsApp", mascota.whatsapp, "tel");
 
-    crearElemento("label", "Estado", formulario).htmlFor = "editarEstado";
+    crearElemento("label", "Estado", formularioEdicion).htmlFor = "editarEstado";
 
     const estado = document.createElement("select");
     estado.id = "editarEstado";
@@ -375,33 +371,71 @@ function abrirPanelPropietario(mascota) {
     });
 
     estado.value = mascota.estado || "En casa";
-    formulario.appendChild(estado);
+    formularioEdicion.appendChild(estado);
 
-    crearElemento("label", "Cambiar fotografía (opcional)", formulario).htmlFor = "editarFoto";
+    crearElemento("label", "Cambiar fotografía (opcional)", formularioEdicion).htmlFor = "editarFoto";
 
     const foto = document.createElement("input");
     foto.id = "editarFoto";
     foto.type = "file";
     foto.accept = "image/*";
     foto.style.cssText = "display:block;margin:10px 0;";
-    formulario.appendChild(foto);
+    formularioEdicion.appendChild(foto);
 
     if (mascota.foto) {
-        crearElemento("p", "Fotografía actual:", formulario);
+        crearElemento("p", "Fotografía actual:", formularioEdicion);
 
         const fotoActual = document.createElement("img");
         fotoActual.src = mascota.foto;
         fotoActual.alt = "Fotografía actual de la mascota";
         fotoActual.style.cssText = "width:150px;max-width:100%;border-radius:12px;";
-        formulario.appendChild(fotoActual);
+        formularioEdicion.appendChild(fotoActual);
     }
+
+    crearElemento("hr", "", formularioEdicion);
+    crearElemento("h3", "🔐 Cambiar clave privada (opcional)", formularioEdicion);
+    crearElemento("p", "Si no quieres cambiar la clave, deja los tres campos vacíos.", formularioEdicion);
+
+    function campoClave(etiqueta, id, placeholder, autocomplete) {
+        const input = document.createElement("input");
+        input.id = id;
+        input.type = "password";
+        input.placeholder = placeholder;
+        input.autocomplete = autocomplete;
+        input.setAttribute("aria-label", etiqueta);
+        input.style.cssText = "width:100%;box-sizing:border-box;padding:10px;margin:6px 0 12px;";
+        formularioEdicion.appendChild(input);
+        return input;
+    }
+
+    const claveActual = campoClave(
+        "Clave actual",
+        "claveActual",
+        "Clave actual",
+        "current-password"
+    );
+
+    const claveNueva = campoClave(
+        "Nueva clave",
+        "claveNueva",
+        "Nueva clave (mínimo 4 caracteres)",
+        "new-password"
+    );
+
+    const confirmarClave = campoClave(
+        "Confirmar nueva clave",
+        "confirmarClave",
+        "Repite la nueva clave",
+        "new-password"
+    );
 
     const guardar = document.createElement("button");
     guardar.type = "submit";
-    guardar.textContent = "💾 Guardar cambios";
-    formulario.appendChild(guardar);
+    guardar.textContent = "💾 Guardar todos los cambios";
+    guardar.style.cssText = "width:100%;padding:12px;margin-top:15px;";
+    formularioEdicion.appendChild(guardar);
 
-    formulario.addEventListener("submit", async function (evento) {
+    formularioEdicion.addEventListener("submit", async function (evento) {
         evento.preventDefault();
 
         const nombre = document.getElementById("editarNombre").value.trim();
@@ -410,8 +444,8 @@ function abrirPanelPropietario(mascota) {
         const color = document.getElementById("editarColor").value.trim();
         const whatsapp = document.getElementById("editarWhatsApp").value.trim();
 
-        if (!nombre || !especie || !raza || !color) {
-            alert("Completa todos los datos.");
+        if (!nombre || !especie || !raza || !color || !sexo.value) {
+            alert("Completa todos los datos de la mascota.");
             return;
         }
 
@@ -420,9 +454,44 @@ function abrirPanelPropietario(mascota) {
             return;
         }
 
+        const actual = claveActual.value;
+        const nueva = claveNueva.value;
+        const confirmacion = confirmarClave.value;
+
+        // Cambiar la clave es opcional: si se escribe algo,
+        // los tres campos deben estar completos y ser válidos.
+        const intentaCambiarClave = actual !== "" || nueva !== "" || confirmacion !== "";
+
+        if (intentaCambiarClave) {
+            if (!actual || !nueva || !confirmacion) {
+                alert("Para cambiar la clave, completa los tres campos.");
+                return;
+            }
+
+            if (actual !== mascota.clave) {
+                alert("La clave actual es incorrecta. No se guardó ningún cambio.");
+                return;
+            }
+
+            if (nueva.length < 4) {
+                alert("La nueva clave debe tener al menos 4 caracteres.");
+                return;
+            }
+
+            if (nueva !== confirmacion) {
+                alert("Las nuevas claves no coinciden. No se guardó ningún cambio.");
+                return;
+            }
+
+            if (nueva === actual) {
+                alert("La nueva clave debe ser diferente de la actual.");
+                return;
+            }
+        }
+
         try {
             guardar.disabled = true;
-            guardar.textContent = "Guardando...";
+            guardar.textContent = "Guardando todos los cambios...";
 
             const cambios = {
                 nombre,
@@ -438,86 +507,42 @@ function abrirPanelPropietario(mascota) {
                 cambios.foto = await obtenerFoto(foto.files[0]);
             }
 
+            if (intentaCambiarClave) {
+                cambios.clave = nueva;
+            }
+
+            // Un solo envío a Firebase para guardar todos los cambios.
             await db.collection("mascotas").doc(mascota.id).update(cambios);
 
-            alert("¡Información actualizada! El mismo QR seguirá funcionando.");
-            await buscarMascota(mascota.id);
+            const documentoActualizado = await db.collection("mascotas")
+                .doc(mascota.id)
+                .get();
+
+            if (!documentoActualizado.exists) {
+                alert("Los cambios se guardaron, pero no se pudo volver a cargar el panel.");
+                return;
+            }
+
+            const mascotaActualizada = documentoActualizado.data();
+
+            alert(
+                intentaCambiarClave
+                    ? "¡Datos y clave actualizados correctamente!"
+                    : "¡Datos actualizados correctamente! La clave se mantuvo sin cambios."
+            );
+
+            // Permanecer en el panel con la información actualizada.
+            abrirPanelPropietario(mascotaActualizada);
         } catch (error) {
             console.error(error);
             alert("No se pudieron guardar los cambios: " + error.message);
         } finally {
             guardar.disabled = false;
-            guardar.textContent = "💾 Guardar cambios";
+            guardar.textContent = "💾 Guardar todos los cambios";
         }
     });
 
-    tarjeta.appendChild(formulario);
-    crearElemento("hr", "", tarjeta);
-    crearElemento("h3", "🔐 Cambiar clave privada", tarjeta);
-    crearElemento("p", "Para cambiar la clave, confirma la clave actual y escribe la nueva dos veces.", tarjeta);
-
-    const claveActual = document.createElement("input");
-    claveActual.type = "password";
-    claveActual.id = "claveActual";
-    claveActual.placeholder = "Clave actual";
-    claveActual.autocomplete = "current-password";
-    claveActual.style.cssText = "width:100%;box-sizing:border-box;padding:10px;margin:6px 0;";
-    tarjeta.appendChild(claveActual);
-
-    const claveNueva = document.createElement("input");
-    claveNueva.type = "password";
-    claveNueva.id = "claveNueva";
-    claveNueva.placeholder = "Nueva clave (mínimo 4 caracteres)";
-    claveNueva.autocomplete = "new-password";
-    claveNueva.style.cssText = "width:100%;box-sizing:border-box;padding:10px;margin:6px 0;";
-    tarjeta.appendChild(claveNueva);
-
-    const confirmarClave = document.createElement("input");
-    confirmarClave.type = "password";
-    confirmarClave.id = "confirmarClave";
-    confirmarClave.placeholder = "Repite la nueva clave";
-    confirmarClave.autocomplete = "new-password";
-    confirmarClave.style.cssText = "width:100%;box-sizing:border-box;padding:10px;margin:6px 0;";
-    tarjeta.appendChild(confirmarClave);
-
-    crearBoton("🔑 Cambiar clave", async function () {
-        const actual = claveActual.value;
-        const nueva = claveNueva.value;
-        const confirmacion = confirmarClave.value;
-
-        if (actual !== mascota.clave) {
-            alert("La clave actual es incorrecta.");
-            return;
-        }
-
-        if (nueva.length < 4) {
-            alert("La nueva clave debe tener al menos 4 caracteres.");
-            return;
-        }
-
-        if (nueva !== confirmacion) {
-            alert("Las nuevas claves no coinciden.");
-            return;
-        }
-
-        if (nueva === actual) {
-            alert("La nueva clave debe ser diferente de la actual.");
-            return;
-        }
-
-        try {
-            await db.collection("mascotas").doc(mascota.id).update({
-                clave: nueva
-            });
-
-            alert("Clave cambiada correctamente. Usa la nueva en tu próximo acceso.");
-            await buscarMascota(mascota.id);
-        } catch (error) {
-            console.error(error);
-            alert("No se pudo cambiar la clave: " + error.message);
-        }
-    }, tarjeta);
-
+    tarjeta.appendChild(formularioEdicion);
     principal.appendChild(tarjeta);
     document.body.appendChild(principal);
 
