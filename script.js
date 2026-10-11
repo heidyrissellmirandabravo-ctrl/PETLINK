@@ -1,7 +1,6 @@
 const btnRegistrar = document.getElementById("btnRegistrar");
 const formulario = document.getElementById("formulario");
 const guardarMascota = document.getElementById("guardarMascota");
-
 const inicio = document.getElementById("inicio");
 const btnBuscarMascota = document.getElementById("btnBuscarMascota");
 const zonaBusqueda = document.getElementById("zonaBusqueda");
