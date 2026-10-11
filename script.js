@@ -2,1116 +2,556 @@ const btnRegistrar = document.getElementById("btnRegistrar");
 const formulario = document.getElementById("formulario");
 const guardarMascota = document.getElementById("guardarMascota");
 
-
-// ========================================
-// MOSTRAR FORMULARIO
-// ========================================
-
+// Mostrar formulario de registro
 btnRegistrar.addEventListener("click", function () {
-
     formulario.style.display = "block";
-
 });
 
-
-// ========================================
-// COMPRIMIR FOTO
-// ========================================
-
+// Comprimir fotografías para guardarlas en Firebase
 function comprimirFoto(archivo) {
-
     return new Promise((resolve, reject) => {
-
         const lector = new FileReader();
 
         lector.onload = function (evento) {
-
             const imagen = new Image();
 
             imagen.onload = function () {
-
-                const canvas =
-                    document.createElement("canvas");
-
-                const tamañoMaximo = 800;
+                const canvas = document.createElement("canvas");
+                const maximo = 800;
 
                 let ancho = imagen.width;
                 let alto = imagen.height;
+                const escala = Math.min(1, maximo / Math.max(ancho, alto));
 
-
-                if (ancho > alto) {
-
-                    if (ancho > tamañoMaximo) {
-
-                        alto =
-                            alto * (tamañoMaximo / ancho);
-
-                        ancho = tamañoMaximo;
-
-                    }
-
-                } else {
-
-                    if (alto > tamañoMaximo) {
-
-                        ancho =
-                            ancho * (tamañoMaximo / alto);
-
-                        alto = tamañoMaximo;
-
-                    }
-
-                }
-
+                ancho = Math.round(ancho * escala);
+                alto = Math.round(alto * escala);
 
                 canvas.width = ancho;
                 canvas.height = alto;
+                canvas.getContext("2d").drawImage(imagen, 0, 0, ancho, alto);
 
-
-                const contexto =
-                    canvas.getContext("2d");
-
-
-                contexto.drawImage(
-                    imagen,
-                    0,
-                    0,
-                    ancho,
-                    alto
-                );
-
-
-                const fotoComprimida =
-                    canvas.toDataURL(
-                        "image/jpeg",
-                        0.7
-                    );
-
-
-                resolve(fotoComprimida);
-
+                resolve(canvas.toDataURL("image/jpeg", 0.7));
             };
 
-
-            imagen.onerror = function () {
-
-                reject(
-                    new Error(
-                        "No se pudo procesar la imagen."
-                    )
-                );
-
-            };
-
-
-            imagen.src =
-                evento.target.result;
-
+            imagen.onerror = () => reject(new Error("No se pudo procesar la imagen."));
+            imagen.src = evento.target.result;
         };
 
-
-        lector.onerror = function () {
-
-            reject(
-                new Error(
-                    "No se pudo leer la fotografía."
-                )
-            );
-
-        };
-
-
+        lector.onerror = () => reject(new Error("No se pudo leer la fotografía."));
         lector.readAsDataURL(archivo);
-
     });
-
 }
 
-
-// ========================================
-// REGISTRAR MASCOTA
-// ========================================
-
-guardarMascota.addEventListener(
-    "click",
-    async function () {
-
-        const nombre =
-            document
-                .getElementById("nombre")
-                .value
-                .trim();
-
-
-        const especie =
-            document
-                .getElementById("especie")
-                .value
-                .trim();
-
-
-        const raza =
-            document
-                .getElementById("raza")
-                .value
-                .trim();
-
-
-        const color =
-            document
-                .getElementById("color")
-                .value
-                .trim();
-
-
-        const sexo =
-            document
-                .getElementById("sexo")
-                .value
-                .trim();
-
-
-        const whatsapp =
-            document
-                .getElementById("whatsapp")
-                .value
-                .trim();
-
-
-        const clave =
-            document
-                .getElementById("clave")
-                .value
-                .trim();
-
-
-        const estado =
-            document
-                .getElementById("estado")
-                .value;
-
-
-        const foto =
-            document
-                .getElementById("foto")
-                .files[0];
-
-
-        // ========================================
-        // VALIDAR DATOS
-        // ========================================
-
-        if (
-            nombre === "" ||
-            especie === "" ||
-            raza === "" ||
-            color === "" ||
-            sexo === ""
-        ) {
-
-            alert(
-                "Por favor, completa todos los datos."
-            );
-
-            return;
-        }
-
-
-        if (whatsapp === "") {
-
-            alert(
-                "Por favor, ingresa el número de WhatsApp."
-            );
-
-            return;
-        }
-
-
-        if (!/^[0-9]{8,15}$/.test(whatsapp)) {
-
-            alert(
-                "El número de WhatsApp debe contener solamente números, entre 8 y 15 dígitos."
-            );
-
-            return;
-        }
-
-
-        if (clave === "") {
-
-            alert(
-                "Por favor, crea una clave privada."
-            );
-
-            return;
-        }
-
-
-        if (clave.length < 4) {
-
-            alert(
-                "La clave privada debe tener al menos 4 caracteres."
-            );
-
-            return;
-        }
-
-
-        if (!foto) {
-
-            alert(
-                "Por favor, selecciona una foto de la mascota."
-            );
-
-            return;
-        }
-
-
-        if (!foto.type.startsWith("image/")) {
-
-            alert(
-                "El archivo seleccionado debe ser una imagen."
-            );
-
-            return;
-        }
-
-
-        if (foto.size > 5 * 1024 * 1024) {
-
-            alert(
-                "La foto no debe superar los 5 MB."
-            );
-
-            return;
-        }
-
-
-        try {
-
-            guardarMascota.disabled = true;
-
-            guardarMascota.textContent =
-                "Guardando mascota...";
-
-
-            // ========================================
-            // CREAR CÓDIGO PETLINK
-            // ========================================
-
-            const idMascota =
-                "PET-" + Date.now();
-
-
-            // ========================================
-            // COMPRIMIR FOTO
-            // ========================================
-
-            const fotoBase64 =
-                await comprimirFoto(foto);
-
-
-            // ========================================
-            // DATOS DE LA MASCOTA
-            // ========================================
-
-            const mascota = {
-
-                id: idMascota,
-
-                nombre: nombre,
-
-                especie: especie,
-
-                raza: raza,
-
-                color: color,
-
-                sexo: sexo,
-
-                estado: estado,
-
-                whatsapp: whatsapp,
-
-                foto: fotoBase64,
-
-                clave: clave
-
-            };
-
-
-            // ========================================
-            // GUARDAR EN FIREBASE
-            // ========================================
-
-            await db
-                .collection("mascotas")
-                .doc(idMascota)
-                .set(mascota);
-
-
-            // ========================================
-            // CREAR ENLACE DEL PERFIL
-            // ========================================
-
-            const urlPerfil =
-                window.location.origin +
-                window.location.pathname +
-                "?id=" +
-                encodeURIComponent(
-                    idMascota
-                );
-
-
-            // ========================================
-            // MOSTRAR RESULTADO
-            // ========================================
-
-            let zonaQR =
-                document.getElementById(
-                    "zonaQR"
-                );
-
-
-            if (!zonaQR) {
-
-                zonaQR =
-                    document.createElement(
-                        "div"
-                    );
-
-                zonaQR.id =
-                    "zonaQR";
-
-                zonaQR.style.marginTop =
-                    "25px";
-
-                formulario.appendChild(
-                    zonaQR
-                );
-
-            }
-
-
-            zonaQR.innerHTML = `
-
-                <h2>🐾 Mascota registrada</h2>
-
-                <p>
-                    <strong>Nombre:</strong>
-                    ${nombre}
-                </p>
-
-                <p>
-                    <strong>Código PETLINK:</strong>
-                    ${idMascota}
-                </p>
-
-                <p>
-                    <strong>Estado:</strong>
-                    ${estado}
-                </p>
-
-                <p>
-                    <strong>Foto:</strong>
-                </p>
-
-                <img
-                    src="${fotoBase64}"
-                    alt="Foto de ${nombre}"
-                    style="
-                        width: 220px;
-                        max-width: 100%;
-                        border-radius: 12px;
-                        display: block;
-                        margin: 10px auto;
-                    "
-                >
-
-                <p>
-                    <strong>Enlace del perfil:</strong>
-                </p>
-
-                <p>
-
-                    <a
-                        href="${urlPerfil}"
-                        target="_blank"
-                    >
-                        ${urlPerfil}
-                    </a>
-
-                </p>
-
-                <div id="codigoQR"></div>
-
-            `;
-
-
-            // ========================================
-            // GENERAR QR
-            // ========================================
-
-            const qrScript =
-                document.createElement(
-                    "script"
-                );
-
-
-            qrScript.src =
-                "https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js";
-
-
-            qrScript.onload =
-                function () {
-
-                    const codigoQR =
-                        document.getElementById(
-                            "codigoQR"
-                        );
-
-
-                    codigoQR.innerHTML =
-                        "";
-
-
-                    new QRCode(
-                        codigoQR,
-                        {
-
-                            text:
-                                urlPerfil,
-
-                            width:
-                                200,
-
-                            height:
-                                200
-
-                        }
-                    );
-
-                };
-
-
-            document.head.appendChild(
-                qrScript
-            );
-
-
-            alert(
-
-                "¡Mascota registrada correctamente! 🐾\n\n" +
-
-                "Código PETLINK: " +
-                idMascota +
-
-                "\n\n" +
-
-                "Estado: " +
-                estado
-
-            );
-
-
-            guardarMascota.disabled =
-                false;
-
-
-            guardarMascota.textContent =
-                "Guardar mascota";
-
-
-        } catch (error) {
-
-            console.error(error);
-
-
-            alert(
-
-                "ERROR AL GUARDAR LA MASCOTA:\n\n" +
-                error.message
-
-            );
-
-
-            guardarMascota.disabled =
-                false;
-
-
-            guardarMascota.textContent =
-                "Guardar mascota";
-
-        }
-
+// Validar y leer fotografía
+async function obtenerFoto(archivo) {
+    if (!archivo) return null;
+
+    if (!archivo.type.startsWith("image/")) {
+        throw new Error("El archivo debe ser una imagen.");
     }
-);
 
+    if (archivo.size > 5 * 1024 * 1024) {
+        throw new Error("La imagen no debe superar los 5 MB.");
+    }
 
-// ========================================
-// DETECTAR QR
-// ========================================
+    return await comprimirFoto(archivo);
+}
 
-const parametros =
-    new URLSearchParams(
-        window.location.search
-    );
+// Registrar mascota
+guardarMascota.addEventListener("click", async function () {
+    const valor = id => document.getElementById(id).value.trim();
 
+    const nombre = valor("nombre");
+    const especie = valor("especie");
+    const raza = valor("raza");
+    const color = valor("color");
+    const sexo = valor("sexo");
+    const whatsapp = valor("whatsapp");
+    const clave = valor("clave");
+    const estado = document.getElementById("estado").value;
+    const archivo = document.getElementById("foto").files[0];
 
-const idBuscado =
-    parametros.get("id");
+    if (!nombre || !especie || !raza || !color || !sexo) {
+        alert("Completa todos los datos de la mascota.");
+        return;
+    }
 
+    if (!/^[0-9]{8,15}$/.test(whatsapp)) {
+        alert("Ingresa el WhatsApp con código de país, solo números y entre 8 y 15 dígitos.");
+        return;
+    }
+
+    if (clave.length < 4) {
+        alert("La clave privada debe tener al menos 4 caracteres.");
+        return;
+    }
+
+    if (!archivo) {
+        alert("Selecciona una fotografía de la mascota.");
+        return;
+    }
+
+    try {
+        guardarMascota.disabled = true;
+        guardarMascota.textContent = "Guardando mascota...";
+
+        const foto = await obtenerFoto(archivo);
+        const id = "PET-" + Date.now();
+
+        const mascota = {
+            id,
+            nombre,
+            especie,
+            raza,
+            color,
+            sexo,
+            estado,
+            whatsapp,
+            foto,
+            clave
+        };
+
+        await db.collection("mascotas").doc(id).set(mascota);
+
+        const urlPerfil = new URL(window.location.href);
+        urlPerfil.search = "";
+        urlPerfil.searchParams.set("id", id);
+
+        let zonaQR = document.getElementById("zonaQR");
+
+        if (!zonaQR) {
+            zonaQR = document.createElement("div");
+            zonaQR.id = "zonaQR";
+            formulario.appendChild(zonaQR);
+        }
+
+        zonaQR.innerHTML = "";
+
+        const titulo = document.createElement("h2");
+        titulo.textContent = "🐾 ¡Mascota registrada!";
+        zonaQR.appendChild(titulo);
+
+        const codigo = document.createElement("p");
+        codigo.textContent = "Código PETLINK: " + id;
+        zonaQR.appendChild(codigo);
+
+        const enlace = document.createElement("a");
+        enlace.href = urlPerfil.href;
+        enlace.textContent = "Abrir perfil de la mascota";
+        enlace.target = "_blank";
+        enlace.rel = "noopener noreferrer";
+        zonaQR.appendChild(enlace);
+
+        const espacioQR = document.createElement("div");
+        espacioQR.id = "codigoQR";
+        espacioQR.style.marginTop = "15px";
+        zonaQR.appendChild(espacioQR);
+
+        const qrScript = document.createElement("script");
+        qrScript.src = "https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js";
+
+        qrScript.onload = function () {
+            new QRCode(espacioQR, {
+                text: urlPerfil.href,
+                width: 200,
+                height: 200
+            });
+        };
+
+        qrScript.onerror = function () {
+            alert("La mascota se guardó, pero no se pudo cargar el generador QR. Puedes abrir el enlace del perfil.");
+        };
+
+        document.head.appendChild(qrScript);
+
+        alert("¡Mascota registrada correctamente!\nCódigo: " + id);
+    } catch (error) {
+        console.error(error);
+        alert("No se pudo registrar la mascota: " + error.message);
+    } finally {
+        guardarMascota.disabled = false;
+        guardarMascota.textContent = "Guardar mascota";
+    }
+});
+
+// Detectar si se abrió un perfil mediante su QR
+const parametros = new URLSearchParams(window.location.search);
+const idBuscado = parametros.get("id");
 
 if (idBuscado) {
-
     buscarMascota(idBuscado);
-
 }
-
-
-// ========================================
-// BUSCAR MASCOTA
-// ========================================
 
 async function buscarMascota(id) {
-
     try {
-
-        const documento =
-            await db
-                .collection("mascotas")
-                .doc(id)
-                .get();
-
+        const documento = await db.collection("mascotas").doc(id).get();
 
         if (documento.exists) {
-
-            const mascota =
-                documento.data();
-
-
-            mostrarPerfil(mascota);
-
+            mostrarPerfil(documento.data());
         } else {
-
             mostrarMascotaNoEncontrada();
-
         }
-
     } catch (error) {
-
         console.error(error);
-
         mostrarMascotaNoEncontrada();
-
     }
-
 }
 
+// Crear elementos de texto de forma segura
+function crearElemento(etiqueta, texto, padre) {
+    const elemento = document.createElement(etiqueta);
+    elemento.textContent = texto;
+    padre.appendChild(elemento);
+    return elemento;
+}
 
-// ========================================
-// MOSTRAR PERFIL
-// ========================================
+function crearBoton(texto, funcion, padre) {
+    const boton = document.createElement("button");
+    boton.type = "button";
+    boton.textContent = texto;
+    boton.addEventListener("click", funcion);
+    padre.appendChild(boton);
+    return boton;
+}
 
+// Mostrar perfil público
 function mostrarPerfil(mascota) {
+    document.body.innerHTML = "";
 
-    document.body.innerHTML = `
+    const cabecera = document.createElement("header");
+    crearElemento("h1", "🐾 PETLINK", cabecera);
+    crearElemento("p", "Perfil de identificación de mascota", cabecera);
+    document.body.appendChild(cabecera);
 
-        <header>
+    const principal = document.createElement("main");
+    const tarjeta = document.createElement("section");
 
-            <h1>🐾 PETLINK</h1>
+    if (mascota.foto) {
+        const foto = document.createElement("img");
+        foto.src = mascota.foto;
+        foto.alt = "Fotografía de " + mascota.nombre;
+        foto.style.cssText = "width:250px;max-width:100%;border-radius:15px;display:block;margin:20px auto;";
+        tarjeta.appendChild(foto);
+    }
 
-            <p>
-                Perfil de identificación de mascota
-            </p>
+    crearElemento("h2", "🐾 " + mascota.nombre, tarjeta);
+    crearElemento("p", "Especie: " + mascota.especie, tarjeta);
+    crearElemento("p", "Raza: " + mascota.raza, tarjeta);
+    crearElemento("p", "Color: " + mascota.color, tarjeta);
+    crearElemento("p", "Sexo: " + mascota.sexo, tarjeta);
 
-        </header>
+    const estado = mascota.estado || "En casa";
+    const estadoTexto = crearElemento("h3", "Estado: " + estado, tarjeta);
 
+    if (estado === "Perdida") {
+        estadoTexto.style.cssText = "background:#b71c1c;color:white;padding:12px;border-radius:8px;";
+    } else if (estado === "Encontrada") {
+        estadoTexto.style.cssText = "background:#fff3cd;color:#664d03;padding:12px;border-radius:8px;";
+    }
 
-        <main>
+    crearElemento("p", "Código PETLINK: " + mascota.id, tarjeta);
+    crearElemento("hr", "", tarjeta);
+    crearElemento("h3", "¿Encontraste esta mascota?", tarjeta);
+    crearElemento("p", "Puedes comunicarte con su propietario para coordinar la devolución.", tarjeta);
 
-            <section>
+    crearBoton("💬 Contactar al dueño por WhatsApp", function () {
+        contactarWhatsApp(mascota.whatsapp, mascota.nombre);
+    }, tarjeta);
 
-                ${
-                    mascota.foto
-                    ?
-                    `
-                    <img
-                        src="${mascota.foto}"
-                        alt="Foto de ${mascota.nombre}"
-                        style="
-                            width: 250px;
-                            max-width: 100%;
-                            border-radius: 15px;
-                            display: block;
-                            margin: 20px auto;
-                        "
-                    >
-                    `
-                    :
-                    ""
-                }
+    crearElemento("hr", "", tarjeta);
+    crearElemento("h3", "🔐 Administración del propietario", tarjeta);
 
+    crearBoton("Administrar mascota", function () {
+        abrirAdministracion(mascota.id);
+    }, tarjeta);
 
-                <h2>
-                    🐶 ${mascota.nombre}
-                </h2>
+    principal.appendChild(tarjeta);
+    document.body.appendChild(principal);
 
-
-                <p>
-                    <strong>Especie:</strong>
-                    ${mascota.especie}
-                </p>
-
-
-                <p>
-                    <strong>Raza:</strong>
-                    ${mascota.raza}
-                </p>
-
-
-                <p>
-                    <strong>Color:</strong>
-                    ${mascota.color}
-                </p>
-
-
-                <p>
-                    <strong>Sexo:</strong>
-                    ${mascota.sexo}
-                </p>
-
-
-                <p>
-                    <strong>Estado:</strong>
-                    ${mascota.estado || "En casa"}
-                </p>
-
-
-                <p>
-                    <strong>Código PETLINK:</strong>
-                    ${mascota.id}
-                </p>
-
-
-                <hr>
-
-
-                <h3>
-                    🐾 ¿Encontraste esta mascota?
-                </h3>
-
-
-                <p>
-                    Si encontraste a esta mascota,
-                    puedes comunicarte directamente
-                    con su propietario.
-                </p>
-
-
-                <button
-                    onclick="contactarWhatsApp(
-                        '${mascota.whatsapp || ""}',
-                        '${mascota.nombre}'
-                    )"
-                >
-
-                    💬 Contactar al dueño por WhatsApp
-
-                </button>
-
-
-                <hr>
-
-
-                <h3>
-                    🔐 Administración del propietario
-                </h3>
-
-
-                <button
-                    onclick="abrirAdministracion('${mascota.id}')"
-                >
-
-                    🔑 Administrar mascota
-
-                </button>
-
-            </section>
-
-        </main>
-
-
-        <footer>
-
-            <p>
-                © 2026 PETLINK 🐾
-            </p>
-
-        </footer>
-
-    `;
-
+    const pie = document.createElement("footer");
+    crearElemento("p", "© 2026 PETLINK 🐾", pie);
+    document.body.appendChild(pie);
 }
 
-
-// ========================================
-// ADMINISTRACIÓN
-// ========================================
-
+// Acceso del propietario
 function abrirAdministracion(idMascota) {
+    const clave = prompt("Ingresa tu clave privada:");
 
-    const claveIngresada =
-        prompt(
-            "🔐 Ingresa la clave privada del propietario:"
-        );
+    if (clave === null || !clave.trim()) return;
 
-
-    if (claveIngresada === null) {
-
-        return;
-
-    }
-
-
-    if (claveIngresada.trim() === "") {
-
-        alert(
-            "Debes ingresar una clave."
-        );
-
-        return;
-
-    }
-
-
-    verificarClave(
-        idMascota,
-        claveIngresada.trim()
-    );
-
+    verificarClave(idMascota, clave.trim());
 }
 
-
-// ========================================
-// VERIFICAR CLAVE
-// ========================================
-
-async function verificarClave(
-    idMascota,
-    claveIngresada
-) {
-
+async function verificarClave(idMascota, claveIngresada) {
     try {
-
-        const documento =
-            await db
-                .collection("mascotas")
-                .doc(idMascota)
-                .get();
-
+        const documento = await db.collection("mascotas").doc(idMascota).get();
 
         if (!documento.exists) {
-
-            alert(
-                "No se encontró la mascota."
-            );
-
+            alert("No se encontró la mascota.");
             return;
-
         }
 
+        const mascota = documento.data();
 
-        const mascota =
-            documento.data();
-
-
-        if (
-            mascota.clave !==
-            claveIngresada
-        ) {
-
-            alert(
-                "❌ Clave incorrecta."
-            );
-
+        if (mascota.clave !== claveIngresada) {
+            alert("Clave incorrecta.");
             return;
-
         }
 
-
-        abrirPanelPropietario(
-            mascota
-        );
-
-
+        abrirPanelPropietario(mascota);
     } catch (error) {
-
         console.error(error);
+        alert("No se pudo verificar la clave.");
+    }
+}
 
+// Panel del propietario: editar datos, cambiar estado y cambiar clave
+function abrirPanelPropietario(mascota) {
+    document.body.innerHTML = "";
 
-        alert(
-            "Ocurrió un error al verificar la clave."
-        );
+    const cabecera = document.createElement("header");
+    crearElemento("h1", "🐾 PETLINK", cabecera);
+    crearElemento("p", "Administración del propietario", cabecera);
+    document.body.appendChild(cabecera);
 
+    const principal = document.createElement("main");
+    const tarjeta = document.createElement("section");
+    crearElemento("h2", "Administrar a " + mascota.nombre, tarjeta);
+    crearElemento("p", "Código PETLINK: " + mascota.id, tarjeta);
+    crearElemento("p", "El código QR y el identificador no cambiarán al editar los datos.", tarjeta);
+
+    crearElemento("h3", "✏️ Editar información", tarjeta);
+
+    const formulario = document.createElement("form");
+    formulario.id = "editarMascotaForm";
+
+    function campo(etiqueta, id, valor, tipo = "text") {
+        crearElemento("label", etiqueta, formulario).htmlFor = id;
+
+        const input = document.createElement("input");
+        input.id = id;
+        input.type = tipo;
+        input.value = valor || "";
+        input.required = true;
+        input.style.cssText = "width:100%;box-sizing:border-box;padding:10px;margin:6px 0 12px;";
+        formulario.appendChild(input);
+        return input;
     }
 
-}
+    campo("Nombre", "editarNombre", mascota.nombre);
+    campo("Especie", "editarEspecie", mascota.especie);
+    campo("Raza", "editarRaza", mascota.raza);
+    campo("Color", "editarColor", mascota.color);
 
+    crearElemento("label", "Sexo", formulario).htmlFor = "editarSexo";
 
-// ========================================
-// PANEL DEL PROPIETARIO
-// ========================================
+    const sexo = document.createElement("select");
+    sexo.id = "editarSexo";
+    sexo.style.cssText = "width:100%;padding:10px;margin:6px 0 12px;";
 
-function abrirPanelPropietario(
-    mascota
-) {
+    ["Macho", "Hembra"].forEach(opcion => {
+        const elemento = document.createElement("option");
+        elemento.value = opcion;
+        elemento.textContent = opcion;
+        sexo.appendChild(elemento);
+    });
 
-    document.body.innerHTML = `
+    sexo.value = mascota.sexo || "Macho";
+    formulario.appendChild(sexo);
 
-        <header>
+    campo("WhatsApp con código de país, solo números", "editarWhatsApp", mascota.whatsapp, "tel");
 
-            <h1>🐾 PETLINK</h1>
+    crearElemento("label", "Estado", formulario).htmlFor = "editarEstado";
 
-            <p>
-                Panel del propietario
-            </p>
+    const estado = document.createElement("select");
+    estado.id = "editarEstado";
+    estado.style.cssText = "width:100%;padding:10px;margin:6px 0 12px;";
 
-        </header>
+    ["En casa", "Perdida", "Encontrada"].forEach(opcion => {
+        const elemento = document.createElement("option");
+        elemento.value = opcion;
+        elemento.textContent = opcion;
+        estado.appendChild(elemento);
+    });
 
+    estado.value = mascota.estado || "En casa";
+    formulario.appendChild(estado);
 
-        <main>
+    crearElemento("label", "Cambiar fotografía (opcional)", formulario).htmlFor = "editarFoto";
 
-            <section>
+    const foto = document.createElement("input");
+    foto.id = "editarFoto";
+    foto.type = "file";
+    foto.accept = "image/*";
+    foto.style.cssText = "display:block;margin:10px 0;";
+    formulario.appendChild(foto);
 
-                <h2>
-                    Administrar a
-                    ${mascota.nombre}
-                </h2>
+    if (mascota.foto) {
+        crearElemento("p", "Fotografía actual:", formulario);
 
+        const fotoActual = document.createElement("img");
+        fotoActual.src = mascota.foto;
+        fotoActual.alt = "Fotografía actual de la mascota";
+        fotoActual.style.cssText = "width:150px;max-width:100%;border-radius:12px;";
+        formulario.appendChild(fotoActual);
+    }
 
-                <p>
-                    <strong>
-                        Código PETLINK:
-                    </strong>
+    const guardar = document.createElement("button");
+    guardar.type = "submit";
+    guardar.textContent = "💾 Guardar cambios";
+    formulario.appendChild(guardar);
 
-                    ${mascota.id}
-                </p>
+    formulario.addEventListener("submit", async function (evento) {
+        evento.preventDefault();
 
+        const nombre = document.getElementById("editarNombre").value.trim();
+        const especie = document.getElementById("editarEspecie").value.trim();
+        const raza = document.getElementById("editarRaza").value.trim();
+        const color = document.getElementById("editarColor").value.trim();
+        const whatsapp = document.getElementById("editarWhatsApp").value.trim();
 
-                <p>
-                    <strong>
-                        Estado actual:
-                    </strong>
+        if (!nombre || !especie || !raza || !color) {
+            alert("Completa todos los datos.");
+            return;
+        }
 
-                    ${mascota.estado || "En casa"}
-                </p>
+        if (!/^[0-9]{8,15}$/.test(whatsapp)) {
+            alert("El WhatsApp debe tener entre 8 y 15 dígitos, incluyendo el código de país.");
+            return;
+        }
 
+        try {
+            guardar.disabled = true;
+            guardar.textContent = "Guardando...";
 
-                <hr>
+            const cambios = {
+                nombre,
+                especie,
+                raza,
+                color,
+                sexo: sexo.value,
+                whatsapp,
+                estado: estado.value
+            };
 
+            if (foto.files[0]) {
+                cambios.foto = await obtenerFoto(foto.files[0]);
+            }
 
-                <h3>
-                    Cambiar estado
-                </h3>
+            await db.collection("mascotas").doc(mascota.id).update(cambios);
 
+            alert("¡Información actualizada! El mismo QR seguirá funcionando.");
+            await buscarMascota(mascota.id);
+        } catch (error) {
+            console.error(error);
+            alert("No se pudieron guardar los cambios: " + error.message);
+        } finally {
+            guardar.disabled = false;
+            guardar.textContent = "💾 Guardar cambios";
+        }
+    });
 
-                <select id="nuevoEstado">
+    tarjeta.appendChild(formulario);
+    crearElemento("hr", "", tarjeta);
+    crearElemento("h3", "🔐 Cambiar clave privada", tarjeta);
+    crearElemento("p", "Para cambiar la clave, confirma la clave actual y escribe la nueva dos veces.", tarjeta);
 
-                    <option value="En casa">
-                        🏠 En casa
-                    </option>
+    const claveActual = document.createElement("input");
+    claveActual.type = "password";
+    claveActual.id = "claveActual";
+    claveActual.placeholder = "Clave actual";
+    claveActual.autocomplete = "current-password";
+    claveActual.style.cssText = "width:100%;box-sizing:border-box;padding:10px;margin:6px 0;";
+    tarjeta.appendChild(claveActual);
 
-                    <option value="Perdida">
-                        🚨 Perdida
-                    </option>
+    const claveNueva = document.createElement("input");
+    claveNueva.type = "password";
+    claveNueva.id = "claveNueva";
+    claveNueva.placeholder = "Nueva clave (mínimo 4 caracteres)";
+    claveNueva.autocomplete = "new-password";
+    claveNueva.style.cssText = "width:100%;box-sizing:border-box;padding:10px;margin:6px 0;";
+    tarjeta.appendChild(claveNueva);
 
-                    <option value="Encontrada">
-                        🔎 Encontrada
-                    </option>
+    const confirmarClave = document.createElement("input");
+    confirmarClave.type = "password";
+    confirmarClave.id = "confirmarClave";
+    confirmarClave.placeholder = "Repite la nueva clave";
+    confirmarClave.autocomplete = "new-password";
+    confirmarClave.style.cssText = "width:100%;box-sizing:border-box;padding:10px;margin:6px 0;";
+    tarjeta.appendChild(confirmarClave);
 
-                </select>
+    crearBoton("🔑 Cambiar clave", async function () {
+        const actual = claveActual.value;
+        const nueva = claveNueva.value;
+        const confirmacion = confirmarClave.value;
 
+        if (actual !== mascota.clave) {
+            alert("La clave actual es incorrecta.");
+            return;
+        }
 
-                <br>
-                <br>
+        if (nueva.length < 4) {
+            alert("La nueva clave debe tener al menos 4 caracteres.");
+            return;
+        }
 
+        if (nueva !== confirmacion) {
+            alert("Las nuevas claves no coinciden.");
+            return;
+        }
 
-                <button
-                    onclick="actualizarEstado('${mascota.id}')"
-                >
+        if (nueva === actual) {
+            alert("La nueva clave debe ser diferente de la actual.");
+            return;
+        }
 
-                    💾 Guardar nuevo estado
-
-                </button>
-
-            </section>
-
-        </main>
-
-
-        <footer>
-
-            <p>
-                © 2026 PETLINK 🐾
-            </p>
-
-        </footer>
-
-    `;
-
-}
-
-
-// ========================================
-// ACTUALIZAR ESTADO
-// ========================================
-
-async function actualizarEstado(
-    idMascota
-) {
-
-    const nuevoEstado =
-        document
-            .getElementById(
-                "nuevoEstado"
-            )
-            .value;
-
-
-    try {
-
-        await db
-            .collection("mascotas")
-            .doc(idMascota)
-            .update({
-
-                estado:
-                    nuevoEstado
-
+        try {
+            await db.collection("mascotas").doc(mascota.id).update({
+                clave: nueva
             });
 
+            alert("Clave cambiada correctamente. Usa la nueva en tu próximo acceso.");
+            await buscarMascota(mascota.id);
+        } catch (error) {
+            console.error(error);
+            alert("No se pudo cambiar la clave: " + error.message);
+        }
+    }, tarjeta);
 
-        alert(
+    principal.appendChild(tarjeta);
+    document.body.appendChild(principal);
 
-            "✅ Estado actualizado correctamente.\n\n" +
-
-            "Nuevo estado: " +
-            nuevoEstado +
-
-            "\n\n" +
-
-            "El código QR sigue siendo el mismo."
-
-        );
-
-
-        window.location.href =
-            window.location.origin +
-            window.location.pathname +
-            "?id=" +
-            encodeURIComponent(
-                idMascota
-            );
-
-
-    } catch (error) {
-
-        console.error(error);
-
-
-        alert(
-
-            "❌ No se pudo actualizar el estado.\n\n" +
-
-            error.message
-
-        );
-
-    }
-
+    const pie = document.createElement("footer");
+    crearElemento("p", "© 2026 PETLINK 🐾", pie);
+    document.body.appendChild(pie);
 }
 
+// Contacto por WhatsApp
+function contactarWhatsApp(numero, nombreMascota) {
+    if (!numero) {
+        alert("El propietario no ha registrado un número de WhatsApp.");
+        return;
+    }
 
-// ========================================
-// MASCOTA NO ENCONTRADA
-// ========================================
+    const mensaje = "Hola, encontré a tu mascota " + nombreMascota +
+        ". Escaneé su código PETLINK. ¿Podemos coordinar para reunirnos?";
+
+    const enlace = "https://wa.me/" + numero +
+        "?text=" + encodeURIComponent(mensaje);
+
+    window.open(enlace, "_blank", "noopener,noreferrer");
+}
 
 function mostrarMascotaNoEncontrada() {
+    document.body.innerHTML = "";
 
-    document.body.innerHTML = `
+    const principal = document.createElement("main");
+    const tarjeta = document.createElement("section");
 
-        <main>
+    crearElemento("h1", "🐾 PETLINK", tarjeta);
+    crearElemento("h2", "Mascota no encontrada", tarjeta);
+    crearElemento("p", "No encontramos información asociada a este código PETLINK.", tarjeta);
 
-            <section>
-
-                <h1>
-                    🐾 PETLINK
-                </h1>
-
-
-                <h2>
-                    Mascota no encontrada
-                </h2>
-
-
-                <p>
-                    No pudimos encontrar la información
-                    asociada a este código PETLINK.
-                </p>
-
-            </section>
-
-        </main>
-
-    `;
-
-}
-
-
-// ========================================
-// CONTACTAR POR WHATSAPP
-// ========================================
-
-function contactarWhatsApp(
-    numero,
-    nombreMascota
-) {
-
-    if (
-        !numero ||
-        numero.trim() === ""
-    ) {
-
-        alert(
-            "El propietario todavía no ha registrado un número de WhatsApp."
-        );
-
-        return;
-
-    }
-
-
-    const mensaje =
-
-        "Hola, encontré a tu mascota " +
-        nombreMascota +
-        ". Escaneé su código PETLINK.";
-
-
-    const enlace =
-
-        "https://wa.me/" +
-        numero +
-        "?text=" +
-        encodeURIComponent(
-            mensaje
-        );
-
-
-    window.open(
-        enlace,
-        "_blank"
-    );
-
+    principal.appendChild(tarjeta);
+    document.body.appendChild(principal);
 }
