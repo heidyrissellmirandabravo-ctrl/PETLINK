@@ -4,6 +4,14 @@ const guardarMascota = document.getElementById("guardarMascota");
 
 const inicio = document.getElementById("inicio");
 const btnBuscarMascota = document.getElementById("btnBuscarMascota");
+if (btnBuscarMascota) {
+    btnBuscarMascota.addEventListener("click", function () {
+        zonaBusqueda.hidden = false;
+        formulario.hidden = true;
+        formulario.style.display = "none";
+        buscarNombre.focus();
+    });
+}
 const zonaBusqueda = document.getElementById("zonaBusqueda");
 const formBusqueda = document.getElementById("formBusqueda");
 const buscarNombre = document.getElementById("buscarNombre");
