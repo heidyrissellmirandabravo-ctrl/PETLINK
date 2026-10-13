@@ -587,3 +587,63 @@ max-width: 100%;
     object-position: center 20%;
   }
 }
+/* ===== BOTONES CENTRALES GRANDES DE PETLINK ===== */
+
+#inicio {
+  text-align: center;
+}
+
+#inicio #btnBuscarMascota,
+#inicio #btnRegistrar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: min(90%, 360px);
+  min-height: 76px;
+  margin: 14px 10px;
+  padding: 20px 24px;
+  border: 0;
+  border-radius: 20px;
+  color: #ffffff;
+  font-size: 21px;
+  font-weight: 800;
+  text-align: center;
+  line-height: 1.3;
+  cursor: pointer;
+  box-shadow: 0 9px 0 rgba(0, 0, 0, 0.10),
+              0 14px 28px rgba(25, 88, 61, 0.20);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#inicio #btnBuscarMascota {
+  background: linear-gradient(135deg, #329967, #17603e);
+}
+
+#inicio #btnRegistrar {
+  background: linear-gradient(135deg, #ffbd4a, #ed8124);
+}
+
+#inicio #btnBuscarMascota:hover,
+#inicio #btnRegistrar:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 0 rgba(0, 0, 0, 0.08),
+              0 18px 32px rgba(25, 88, 61, 0.26);
+}
+
+#inicio #btnBuscarMascota:active,
+#inicio #btnRegistrar:active {
+  transform: translateY(2px);
+}
+
+/* Centrado en pantallas pequeñas */
+@media (max-width: 650px) {
+  #inicio #btnBuscarMascota,
+  #inicio #btnRegistrar {
+    display: flex;
+    width: 100%;
+    max-width: 380px;
+    margin: 14px auto;
+    min-height: 70px;
+    font-size: 19px;
+  }
+}
