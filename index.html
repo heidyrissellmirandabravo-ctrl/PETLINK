@@ -1,823 +1,896 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#176b55">
-
-    <title>PETLINK | Conectando mascotas con sus familias</title>
-
-    <meta
-        name="description"
-        content="PETLINK ayuda a identificar mascotas mediante códigos QR y una plataforma web para facilitar el contacto con sus propietarios."
-    >
-
-    <link rel="stylesheet" href="estilo.css">
-
-    <style>
-        :root {
-            --pet-verde: #176b55;
-            --pet-verde-oscuro: #104b3e;
-            --pet-verde-claro: #eaf5ef;
-            --pet-crema: #fffaf2;
-            --pet-texto: #26352f;
-            --pet-suave: #68766f;
-            --pet-borde: #e2ebe5;
-            --pet-sombra: 0 14px 38px rgba(27, 70, 51, 0.09);
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            margin: 0;
-            background: var(--pet-crema);
-            color: var(--pet-texto);
-            font-family: "Segoe UI", Arial, sans-serif;
-            line-height: 1.6;
-        }
-
-        button,
-        input,
-        select {
-            font: inherit;
-        }
-
-        button {
-            cursor: pointer;
-            transition: transform 0.2s ease, background 0.2s ease;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-        }
-
-        button:disabled {
-            opacity: 0.65;
-            cursor: wait;
-            transform: none;
-        }
-
-        [hidden] {
-            display: none !important;
-        }
-
-        .pet-cabecera {
-            padding: 22px 6%;
-            color: white;
-            background: linear-gradient(
-                120deg,
-                var(--pet-verde-oscuro),
-                var(--pet-verde)
-            );
-        }
-
-        .pet-cabecera-interior {
-            max-width: 1180px;
-            margin: auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 20px;
-        }
-
-        .pet-logo {
-            margin: 0;
-            font-size: clamp(1.8rem, 4vw, 2.5rem);
-            letter-spacing: 1px;
-        }
-
-        .pet-lema {
-            margin: 5px 0 0;
-            color: #e4f5eb;
-            font-size: 0.98rem;
-        }
-
-        .pet-huellas {
-            font-size: 2.6rem;
-        }
-
-        .pet-contenedor {
-            width: min(1180px, 90%);
-            margin: 0 auto;
-        }
-
-        .pet-inicio {
-            padding-top: 42px;
-            padding-bottom: 48px;
-        }
-
-        .pet-presentacion {
-            display: grid;
-            grid-template-columns: 1fr 0.85fr;
-            align-items: center;
-            gap: 42px;
-            padding: 28px 0 44px;
-        }
-
-        .pet-etiqueta {
-            display: inline-block;
-            padding: 7px 14px;
-            border-radius: 30px;
-            color: var(--pet-verde);
-            background: var(--pet-verde-claro);
-            font-weight: 700;
-            font-size: 0.88rem;
-        }
-
-        .pet-titulo-principal {
-            margin: 18px 0;
-            font-size: clamp(2.1rem, 4.8vw, 3.8rem);
-            line-height: 1.12;
-            color: var(--pet-verde-oscuro);
-        }
-
-        .pet-titulo-principal span {
-            color: var(--pet-verde);
-        }
-
-        .pet-descripcion {
-            max-width: 600px;
-            color: var(--pet-suave);
-            font-size: 1.08rem;
-        }
-
-        .pet-foto-familiar {
-            width: 100%;
-            height: 340px;
-            object-fit: cover;
-            object-position: center;
-            display: block;
-            border-radius: 26px;
-            box-shadow: var(--pet-sombra);
-            border: 7px solid white;
-        }
-
-        .pet-botones-inicio {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-top: 25px;
-        }
-
-        .pet-boton {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            min-height: 48px;
-            padding: 12px 21px;
-            border: 0;
-            border-radius: 12px;
-            background: var(--pet-verde);
-            color: white;
-            font-weight: 700;
-            box-shadow: 0 6px 15px rgba(23, 107, 85, 0.13);
-        }
-
-        .pet-boton:hover {
-            background: var(--pet-verde-oscuro);
-        }
-
-        .pet-boton-secundario {
-            background: white;
-            color: var(--pet-verde);
-            border: 1px solid #cbded2;
-            box-shadow: none;
-        }
-
-        .pet-boton-secundario:hover {
-            background: var(--pet-verde-claro);
-        }
-
-        .pet-galeria-titulo {
-            margin: 12px 0 20px;
-            text-align: center;
-            color: var(--pet-verde-oscuro);
-            font-size: clamp(1.5rem, 3vw, 2rem);
-        }
-
-        .hero-galeria {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 22px;
-        }
-
-        .hero-foto {
-            position: relative;
-            overflow: hidden;
-            border-radius: 20px;
-            background: #e8eee9;
-            box-shadow: var(--pet-sombra);
-        }
-
-        .hero-foto img {
-            display: block;
-            width: 100%;
-            height: 250px;
-            object-fit: cover;
-        }
-
-        .hero-etiqueta {
-            padding: 14px 16px;
-            color: var(--pet-verde-oscuro);
-            background: white;
-            font-weight: 700;
-        }
-
-        .pet-beneficios {
-            margin: 18px 0 45px;
-            padding: 28px;
-            border-radius: 24px;
-            background: white;
-            border: 1px solid var(--pet-borde);
-        }
-
-        .pet-beneficios h2 {
-            text-align: center;
-            color: var(--pet-verde-oscuro);
-            margin-top: 0;
-        }
-
-        .beneficios {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 20px;
-        }
-
-        .beneficio {
-            padding: 20px;
-            border-radius: 16px;
-            background: #f6faf7;
-            text-align: center;
-        }
-
-        .beneficio h3 {
-            color: var(--pet-verde);
-            margin: 8px 0;
-        }
-
-        .beneficio p {
-            margin-bottom: 0;
-            color: var(--pet-suave);
-        }
-
-        .pet-icono-beneficio {
-            font-size: 2rem;
-        }
-
-        .pet-seccion {
-            width: min(760px, 90%);
-            margin: 36px auto 60px;
-            padding: clamp(22px, 5vw, 38px);
-            background: white;
-            border: 1px solid var(--pet-borde);
-            border-radius: 24px;
-            box-shadow: var(--pet-sombra);
-        }
-
-        .pet-seccion h2 {
-            color: var(--pet-verde-oscuro);
-            line-height: 1.25;
-        }
-
-        .pet-seccion-intro {
-            color: var(--pet-suave);
-        }
-
-        .pet-formulario label {
-            display: block;
-            margin: 16px 0 6px;
-            font-weight: 700;
-            color: #344b40;
-        }
-
-        .pet-formulario input,
-        .pet-formulario select {
-            display: block;
-            width: 100%;
-            min-height: 46px;
-            padding: 11px 13px;
-            border: 1px solid #d6e2da;
-            border-radius: 10px;
-            background: #fff;
-            color: var(--pet-texto);
-        }
-
-        .pet-formulario input:focus,
-        .pet-formulario select:focus {
-            outline: 2px solid #a8d8bf;
-            border-color: var(--pet-verde);
-        }
-
-        .pet-ayuda {
-            margin: 7px 0 0;
-            color: var(--pet-suave);
-            font-size: 0.9rem;
-        }
-
-        .pet-formulario .pet-boton {
-            width: 100%;
-            margin-top: 22px;
-        }
-
-        .pet-aviso-privacidad {
-            padding: 13px;
-            margin-top: 20px;
-            border-radius: 12px;
-            background: #f1f8f3;
-            color: #476455;
-            font-size: 0.9rem;
-        }
-
-        .pet-resultados {
-            margin-top: 25px;
-        }
-
-        .tarjeta-mascota {
-            margin-top: 22px;
-            padding: 20px;
-            border: 1px solid var(--pet-borde);
-            border-radius: 18px;
-            background: #fbfdfb;
-            overflow-wrap: anywhere;
-        }
-
-        .tarjeta-mascota > img {
-            display: block;
-            width: min(240px, 100%);
-            height: 210px;
-            object-fit: cover;
-            border-radius: 14px;
-            margin: 0 auto 15px;
-        }
-
-        .tarjeta-mascota h3,
-        .tarjeta-mascota h4 {
-            color: var(--pet-verde-oscuro);
-        }
-
-        .tarjeta-mascota button {
-            margin-top: 8px;
-            margin-right: 7px;
-            padding: 10px 15px;
-            border: 0;
-            border-radius: 9px;
-            background: var(--pet-verde);
-            color: white;
-            font-weight: 700;
-        }
-
-        #zonaQR {
-            margin-top: 28px;
-            padding: 22px;
-            border: 1px solid var(--pet-borde);
-            border-radius: 18px;
-            text-align: center;
-            background: #f7fbf8;
-            overflow-wrap: anywhere;
-        }
-
-        #zonaQR a {
-            color: var(--pet-verde);
-            font-weight: 700;
-        }
-
-        #zonaQR canvas,
-        #zonaQR img {
-            max-width: 100%;
-            height: auto;
-        }
-
-        #mensajeBusqueda {
-            padding: 12px;
-            margin-top: 16px;
-            border-radius: 10px;
-            background: #f1f8f3;
-        }
-
-        .pet-pie {
-            padding: 28px 5%;
-            text-align: center;
-            color: #e8f3ec;
-            background: var(--pet-verde-oscuro);
-        }
-
-        .pet-pie p {
-            margin: 5px;
-        }
-
-        @media (max-width: 760px) {
-            .pet-cabecera-interior {
-                align-items: flex-start;
-            }
-
-            .pet-huellas {
-                font-size: 1.8rem;
-            }
-
-            .pet-presentacion {
-                grid-template-columns: 1fr;
-                gap: 24px;
-                padding-top: 15px;
-            }
-
-            .pet-foto-familiar {
-                height: 270px;
-            }
-
-            .hero-galeria {
-                gap: 13px;
-            }
-
-            .hero-foto img {
-                height: 170px;
-            }
-
-            .hero-etiqueta {
-                font-size: 0.88rem;
-                padding: 11px;
-            }
-
-            .beneficios {
-                grid-template-columns: 1fr;
-            }
-
-            .pet-beneficios {
-                padding: 20px;
-            }
-        }
-
-        @media (max-width: 420px) {
-            .pet-contenedor {
-                width: 92%;
-            }
-
-            .pet-cabecera {
-                padding: 18px 4%;
-            }
-
-            .pet-lema {
-                font-size: 0.84rem;
-            }
-
-            .pet-foto-familiar {
-                height: 230px;
-            }
-
-            .pet-botones-inicio {
-                flex-direction: column;
-            }
-
-            .pet-botones-inicio .pet-boton {
-                width: 100%;
-            }
-
-            .hero-foto img {
-                height: 135px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#edf6ee">
+  <meta name="description" content="PETLINK conecta a las mascotas con sus familias mediante un código QR y una plataforma web.">
+  <title>PETLINK | Siempre cerca de tu mascota</title>
+
+  <style>
+    :root {
+      --verde: #286548;
+      --verde-oscuro: #194c38;
+      --verde-claro: #e8f4e9;
+      --verde-suave: #f4faf3;
+      --crema: #fffaf1;
+      --texto: #30463a;
+      --texto-suave: #64766a;
+      --blanco: #ffffff;
+      --borde: #dce9dd;
+      --sombra: 0 12px 32px rgba(36, 82, 56, 0.09);
+      --radio: 22px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--texto);
+      font-family: "Segoe UI", Arial, sans-serif;
+      line-height: 1.6;
+      background-color: var(--crema);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='110' height='110' viewBox='0 0 110 110'%3E%3Cg fill='%237eaf8a' fill-opacity='.13'%3E%3Cellipse cx='53' cy='70' rx='11' ry='9'/%3E%3Cellipse cx='38' cy='55' rx='5' ry='7' transform='rotate(-25 38 55)'/%3E%3Cellipse cx='49' cy='47' rx='5' ry='7' transform='rotate(-10 49 47)'/%3E%3Cellipse cx='61' cy='47' rx='5' ry='7' transform='rotate(10 61 47)'/%3E%3Cellipse cx='72' cy='56' rx='5' ry='7' transform='rotate(25 72 56)'/%3E%3C/g%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 110px 110px;
+    }
+
+    img {
+      max-width: 100%;
+    }
+
+    button, input, select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .contenedor {
+      width: min(1120px, 92%);
+      margin: 0 auto;
+    }
+
+    /* ENCABEZADO CLARO: PETLINK SE LEE BIEN */
+    .pet-cabecera {
+      position: relative;
+      background: linear-gradient(115deg, #edf7ed, #ffffff 60%, #f8f4e9);
+      border-bottom: 1px solid #dce9dd;
+      box-shadow: 0 4px 18px rgba(36, 82, 56, 0.05);
+    }
+
+    .pet-cabecera-interior {
+      width: min(1120px, 92%);
+      min-height: 105px;
+      margin: 0 auto;
+      padding: 17px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .marca {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .marca-icono {
+      width: 57px;
+      height: 57px;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      border-radius: 18px;
+      background: #dcefe0;
+      font-size: 30px;
+    }
+
+    .pet-logo {
+      margin: 0;
+      color: var(--verde-oscuro);
+      font-size: clamp(2rem, 4vw, 2.7rem);
+      font-weight: 850;
+      line-height: 1.05;
+      letter-spacing: 1.5px;
+      text-shadow: none;
+    }
+
+    .pet-lema {
+      margin: 7px 0 0;
+      color: #526d5b;
+      font-size: 0.94rem;
+    }
+
+    .cabecera-etiqueta {
+      padding: 9px 16px;
+      border: 1px solid #d9e8d9;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.8);
+      color: var(--verde);
+      font-size: 0.88rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    /* BOTONES */
+    .pet-boton {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 48px;
+      padding: 12px 22px;
+      border: 2px solid transparent;
+      border-radius: 14px;
+      font-weight: 750;
+      text-align: center;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+
+    .pet-boton:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 7px 18px rgba(31, 78, 52, 0.13);
+    }
+
+    .pet-boton-principal {
+      color: white;
+      background: var(--verde);
+    }
+
+    .pet-boton-principal:hover {
+      background: var(--verde-oscuro);
+    }
+
+    .pet-boton-secundario {
+      color: var(--verde-oscuro);
+      background: white;
+      border-color: #cbded0;
+    }
+
+    .pet-boton-claro {
+      color: var(--verde-oscuro);
+      background: #e6f3e7;
+    }
+
+    .pet-boton-peligro {
+      color: #a53636;
+      background: #fff0ed;
+      border-color: #f3d1ca;
+    }
+
+    /* PRESENTACIÓN HORIZONTAL */
+    .pet-presentacion {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(300px, 0.9fr);
+      align-items: center;
+      gap: clamp(28px, 5vw, 64px);
+      padding: 52px 0 42px;
+    }
+
+    .pet-presentacion-texto {
+      padding: 10px 0;
+    }
+
+    .pet-etiqueta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 13px;
+      border: 1px solid #d5e8d7;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.85);
+      color: var(--verde);
+      font-size: 0.86rem;
+      font-weight: 750;
+    }
+
+    .pet-titulo-principal {
+      margin: 20px 0 15px;
+      color: var(--verde-oscuro);
+      font-size: clamp(2.2rem, 4.5vw, 3.65rem);
+      font-weight: 850;
+      letter-spacing: -1.6px;
+      line-height: 1.12;
+    }
+
+    .pet-titulo-principal span {
+      color: #4e9164;
+    }
+
+    .pet-descripcion {
+      max-width: 540px;
+      margin: 0 0 25px;
+      color: #5c7062;
+      font-size: 1.08rem;
+    }
+
+    .pet-botones-inicio {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .pet-nota {
+      margin-top: 20px;
+      color: var(--texto-suave);
+      font-size: 0.9rem;
+    }
+
+    .pet-foto-marco {
+      position: relative;
+      padding: 9px;
+      border: 1px solid #e3eadc;
+      border-radius: 30px;
+      background: white;
+      box-shadow: var(--sombra);
+    }
+
+    .pet-foto-familiar {
+      display: block;
+      width: 100%;
+      height: 375px;
+      object-fit: cover;
+      object-position: center;
+      border-radius: 23px;
+    }
+
+    .pet-foto-pie {
+      position: absolute;
+      right: 20px;
+      bottom: 20px;
+      left: 20px;
+      padding: 12px 15px;
+      border: 1px solid rgba(255,255,255,0.8);
+      border-radius: 15px;
+      background: rgba(255,255,255,0.94);
+      color: var(--verde-oscuro);
+      font-weight: 750;
+      text-align: center;
+    }
+
+    /* SECCIONES GENERALES */
+    .pet-seccion {
+      margin: 28px auto;
+      padding: clamp(23px, 4vw, 40px);
+      border: 1px solid rgba(218, 232, 219, 0.9);
+      border-radius: var(--radio);
+      background: rgba(255,255,255,0.96);
+      box-shadow: 0 8px 24px rgba(36, 82, 56, 0.055);
+    }
+
+    .pet-titulo-seccion {
+      margin: 0 0 9px;
+      color: var(--verde-oscuro);
+      font-size: clamp(1.6rem, 3vw, 2.15rem);
+      line-height: 1.25;
+      text-align: center;
+    }
+
+    .pet-subtitulo {
+      max-width: 700px;
+      margin: 0 auto 27px;
+      color: var(--texto-suave);
+      text-align: center;
+    }
+
+    /* FOTOS DE PERROS Y GATOS */
+    .pet-galeria {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px;
+    }
+
+    .pet-tarjeta-animal {
+      overflow: hidden;
+      border: 1px solid var(--borde);
+      border-radius: 20px;
+      background: #fff;
+      box-shadow: 0 7px 20px rgba(36, 82, 56, 0.06);
+    }
+
+    .pet-tarjeta-animal img {
+      display: block;
+      width: 100%;
+      height: 245px;
+      object-fit: cover;
+    }
+
+    .pet-tarjeta-contenido {
+      padding: 20px;
+    }
+
+    .pet-tarjeta-contenido h3 {
+      margin: 0 0 7px;
+      color: var(--verde-oscuro);
+      font-size: 1.2rem;
+    }
+
+    .pet-tarjeta-contenido p {
+      margin: 0;
+      color: var(--texto-suave);
+    }
+
+    /* BENEFICIOS */
+    .pet-beneficios {
+      margin: 28px auto;
+      padding: 35px 0;
+      border-radius: var(--radio);
+      background: rgba(237, 247, 237, 0.92);
+    }
+
+    .pet-beneficios-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .pet-beneficio {
+      padding: 23px 20px;
+      border: 1px solid #dceadd;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.92);
+      text-align: center;
+    }
+
+    .pet-beneficio-icono {
+      display: grid;
+      width: 57px;
+      height: 57px;
+      margin: 0 auto 12px;
+      place-items: center;
+      border-radius: 17px;
+      background: #e2f2e4;
+      font-size: 28px;
+    }
+
+    .pet-beneficio h3 {
+      margin: 0 0 8px;
+      color: var(--verde-oscuro);
+    }
+
+    .pet-beneficio p {
+      margin: 0;
+      color: var(--texto-suave);
+      font-size: 0.94rem;
+    }
+
+    /* FORMULARIOS */
+    .pet-formulario {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .pet-form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .pet-campo {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      min-width: 0;
+    }
+
+    .pet-campo-completo {
+      grid-column: 1 / -1;
+    }
+
+    .pet-campo label {
+      color: #365342;
+      font-size: 0.94rem;
+      font-weight: 750;
+    }
+
+    .pet-campo input,
+    .pet-campo select {
+      width: 100%;
+      min-height: 47px;
+      padding: 11px 13px;
+      border: 1px solid #cfdfd1;
+      border-radius: 12px;
+      outline: none;
+      background: #fff;
+      color: var(--texto);
+    }
+
+    .pet-campo input:focus,
+    .pet-campo select:focus {
+      border-color: #55956a;
+      box-shadow: 0 0 0 3px rgba(85,149,106,0.14);
+    }
+
+    .pet-ayuda {
+      margin: 0;
+      color: var(--texto-suave);
+      font-size: 0.85rem;
+    }
+
+    .pet-form-botones {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 25px;
+    }
+
+    .pet-mensaje {
+      margin: 16px 0;
+      padding: 13px 15px;
+      border-radius: 12px;
+      background: #f3f8f2;
+      color: var(--verde-oscuro);
+    }
+
+    /* BÚSQUEDA */
+    .pet-busqueda {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .pet-busqueda-fila {
+      display: flex;
+      align-items: stretch;
+      gap: 10px;
+    }
+
+    .pet-busqueda-fila input {
+      flex: 1;
+      min-width: 0;
+      min-height: 48px;
+      padding: 12px 15px;
+      border: 1px solid #cfdfd1;
+      border-radius: 12px;
+      outline: none;
+      background: #fff;
+    }
+
+    .pet-busqueda-fila input:focus {
+      border-color: #55956a;
+      box-shadow: 0 0 0 3px rgba(85,149,106,0.14);
+    }
+
+    /* ZONA DEL QR CREADA O UTILIZADA POR script.js */
+    #zonaQR {
+      overflow-wrap: anywhere;
+      margin-top: 25px;
+    }
+
+    #zonaQR img,
+    #zonaQR canvas {
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* PIE DE PÁGINA */
+    .pet-pie-pagina {
+      margin-top: 55px;
+      padding: 34px 20px;
+      border-top: 1px solid #dce9dd;
+      background: rgba(237, 247, 237, 0.96);
+      text-align: center;
+    }
+
+    .pet-pie-pagina strong {
+      color: var(--verde-oscuro);
+      font-size: 1.35rem;
+      letter-spacing: 1px;
+    }
+
+    .pet-pie-pagina p {
+      margin: 7px 0;
+      color: var(--texto-suave);
+    }
+
+    /* ACCESIBILIDAD Y ADAPTACIÓN A CELULARES */
+    button:focus-visible,
+    a:focus-visible {
+      outline: 3px solid #76a982;
+      outline-offset: 3px;
+    }
+
+    @media (max-width: 760px) {
+      .pet-cabecera-interior {
+        min-height: auto;
+        align-items: flex-start;
+      }
+
+      .cabecera-etiqueta {
+        display: none;
+      }
+
+      .pet-presentacion {
+        grid-template-columns: 1fr;
+        gap: 24px;
+        padding-top: 32px;
+      }
+
+      .pet-presentacion-texto {
+        padding: 0;
+      }
+
+      .pet-foto-familiar {
+        height: 290px;
+      }
+
+      .pet-galeria {
+        grid-template-columns: 1fr;
+      }
+
+      .pet-beneficios-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .pet-cabecera-interior {
+        gap: 10px;
+      }
+
+      .marca {
+        gap: 10px;
+      }
+
+      .marca-icono {
+        width: 47px;
+        height: 47px;
+        border-radius: 14px;
+        font-size: 25px;
+      }
+
+      .pet-logo {
+        font-size: 1.9rem;
+      }
+
+      .pet-lema {
+        font-size: 0.78rem;
+      }
+
+      .pet-titulo-principal {
+        font-size: 2.3rem;
+      }
+
+      .pet-botones-inicio,
+      .pet-form-botones {
+        flex-direction: column;
+      }
+
+      .pet-botones-inicio .pet-boton,
+      .pet-form-botones .pet-boton {
+        width: 100%;
+      }
+
+      .pet-form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .pet-campo-completo {
+        grid-column: auto;
+      }
+
+      .pet-busqueda-fila {
+        flex-direction: column;
+      }
+
+      .pet-busqueda-fila .pet-boton {
+        width: 100%;
+      }
+
+      .pet-seccion {
+        padding: 22px 16px;
+      }
+    }
+  </style>
 </head>
 
 <body>
-    <header class="pet-cabecera">
-        <div class="pet-cabecera-interior">
-            <div>
-                <h1 class="pet-logo">🐾 PETLINK</h1>
-                <p class="pet-lema">
-                    Una conexión que ayuda a reunir familias y mascotas.
-                </p>
-            </div>
 
-            <div class="pet-huellas" aria-hidden="true">🐾</div>
+  <!-- ENCABEZADO -->
+  <header class="pet-cabecera">
+    <div class="pet-cabecera-interior">
+      <div class="marca">
+        <div class="marca-icono" aria-hidden="true">🐾</div>
+        <div>
+          <h1 class="pet-logo">PETLINK</h1>
+          <p class="pet-lema">Una conexión que puede traerlos de vuelta a casa</p>
         </div>
-    </header>
+      </div>
+      <div class="cabecera-etiqueta">🐶 Amor · Protección · Conexión 🐱</div>
+    </div>
+  </header>
 
-    <main>
-        <!-- INICIO -->
-        <section id="inicio" class="pet-contenedor pet-inicio">
-            <div class="pet-presentacion">
-                <div>
-                    <span class="pet-etiqueta">
-                        Tecnología con amor por los animales
-                    </span>
+  <main class="contenedor">
 
-                    <h2 class="pet-titulo-principal">
-                        Porque cada mascota merece <span>volver a casa.</span>
-                    </h2>
+    <!-- PRESENTACIÓN: TEXTO A LA IZQUIERDA, FOTO FAMILIAR A LA DERECHA -->
+    <section class="pet-presentacion" id="presentacion">
+      <div class="pet-presentacion-texto">
+        <span class="pet-etiqueta">🐾 Tecnología hecha con amor</span>
 
-                    <p class="pet-descripcion">
-                        PETLINK conecta a las mascotas con sus familias
-                        mediante un collar con código QR y una plataforma web.
-                        Si alguien encuentra una mascota, puede escanear su
-                        código y consultar su información para ayudarla a
-                        regresar con su propietario.
-                    </p>
+        <h2 class="pet-titulo-principal">
+          Porque cada mascota merece <span>volver a casa.</span>
+        </h2>
 
-                    <p class="pet-descripcion">
-                        Una pequeña conexión puede hacer una gran diferencia.
-                    </p>
+        <p class="pet-descripcion">
+          PETLINK conecta a las mascotas con sus familias mediante un collar
+          con código QR y una plataforma web. Si alguien encuentra a tu mascota,
+          puede escanear su código para consultar su perfil y comunicarse contigo.
+        </p>
 
-                    <div class="pet-botones-inicio">
-                        <button
-                            type="button"
-                            id="btnRegistrar"
-                            class="pet-boton"
-                        >
-                            🐾 Registrar mascota
-                        </button>
+        <div class="pet-botones-inicio">
+          <button type="button" class="pet-boton pet-boton-principal" id="btnRegistrar">
+            🐾 Registrar mi mascota
+          </button>
 
-                        <button
-                            type="button"
-                            id="btnBuscarMascota"
-                            class="pet-boton pet-boton-secundario"
-                        >
-                            🔎 Buscar mascota
-                        </button>
-                    </div>
-                </div>
+          <button type="button" class="pet-boton pet-boton-secundario" id="btnBuscarMascota">
+            🔎 Buscar una mascota
+          </button>
+        </div>
 
-                <div>
-                    <img
-                        class="pet-foto-familiar"
-                        src="./petfoto-pet-8147283.jpg"
-                        alt="Una familia compartiendo el cariño por su mascota"
-                    >
-                </div>
-            </div>
+        <p class="pet-nota">
+          💚 Fácil de usar desde el navegador de un celular, sin instalar una aplicación.
+        </p>
+      </div>
 
-            <h2 class="pet-galeria-titulo">
-                Ellos son parte de nuestra familia ❤️
-            </h2>
-
-            <div class="hero-galeria">
-                <div class="hero-foto">
-                    <img
-                        src="https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=800&q=85"
-                        alt="Perro de compañía"
-                        loading="lazy"
-                    >
-                    <div class="hero-etiqueta">
-                        🐶 Ellos también son familia
-                    </div>
-                </div>
-
-                <div class="hero-foto">
-                    <img
-                        src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=800&q=85"
-                        alt="Gato de compañía"
-                        loading="lazy"
-                    >
-                    <div class="hero-etiqueta">
-                        🐱 Cada mascota es especial
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- BENEFICIOS -->
-        <section class="pet-contenedor pet-beneficios">
-            <h2>¿Cómo ayuda PETLINK?</h2>
-
-            <div class="beneficios">
-                <article class="beneficio">
-                    <div class="pet-icono-beneficio">📱</div>
-                    <h3>Escaneo sencillo</h3>
-                    <p>
-                        El código QR se puede leer con la cámara de un celular,
-                        sin instalar una aplicación especial.
-                    </p>
-                </article>
-
-                <article class="beneficio">
-                    <div class="pet-icono-beneficio">🐕</div>
-                    <h3>Información útil</h3>
-                    <p>
-                        Permite consultar la fotografía, las características
-                        y el estado registrado de la mascota.
-                    </p>
-                </article>
-
-                <article class="beneficio">
-                    <div class="pet-icono-beneficio">💚</div>
-                    <h3>Contacto directo</h3>
-                    <p>
-                        Facilita la comunicación con el propietario mediante
-                        WhatsApp para coordinar el reencuentro.
-                    </p>
-                </article>
-            </div>
-        </section>
-
-        <!-- BUSCADOR: los identificadores deben conservarse -->
-        <section
-            id="zonaBusqueda"
-            class="pet-seccion"
-            hidden
+      <div class="pet-foto-marco">
+        <img
+          class="pet-foto-familiar"
+          src="./petfoto-pet-8147283.jpg"
+          alt="Familia compartiendo el cariño por sus mascotas"
+          loading="eager"
         >
-            <h2>🔎 Buscar una mascota</h2>
+        <div class="pet-foto-pie">🐕‍🦺 Su seguridad también es parte de la familia</div>
+      </div>
+    </section>
 
-            <p class="pet-seccion-intro">
-                Escribe el nombre de la mascota para consultar si está
-                registrada en PETLINK.
-            </p>
+    <!-- FOTOS DE PERROS Y GATOS: NO REPETIR AQUÍ LA FOTO FAMILIAR -->
+    <section class="pet-seccion" id="sobrePetlink">
+      <h2 class="pet-titulo-seccion">Un pequeño código, una gran esperanza</h2>
+      <p class="pet-subtitulo">
+        Una forma sencilla de ayudar a que una mascota encontrada pueda volver
+        con las personas que la quieren.
+      </p>
 
-            <form id="formBusqueda" class="pet-formulario">
-                <label for="buscarNombre">Nombre de la mascota</label>
+      <div class="pet-galeria">
+        <article class="pet-tarjeta-animal">
+          <img
+            src="https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=900&q=85"
+            alt="Perro acompañado de su familia"
+            loading="lazy"
+          >
+          <div class="pet-tarjeta-contenido">
+            <h3>🐶 Para nuestros amigos perrunos</h3>
+            <p>Un perfil digital que ayuda a compartir información importante y facilitar el contacto con su familia.</p>
+          </div>
+        </article>
 
-                <input
-                    type="text"
-                    id="buscarNombre"
-                    placeholder="Ejemplo: Luna"
-                    autocomplete="off"
-                    required
-                >
+        <article class="pet-tarjeta-animal">
+          <img
+            src="https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&w=900&q=85"
+            alt="Gato doméstico"
+            loading="lazy"
+          >
+          <div class="pet-tarjeta-contenido">
+            <h3>🐱 Para nuestros amigos gatunos</h3>
+            <p>También los gatos pueden tener su identificación QR y un perfil con sus datos esenciales.</p>
+          </div>
+        </article>
+      </div>
+    </section>
 
-                <button
-                    type="submit"
-                    id="ejecutarBusqueda"
-                    class="pet-boton"
-                >
-                    Buscar mascotas
-                </button>
-            </form>
+    <!-- BENEFICIOS -->
+    <section class="pet-beneficios">
+      <div class="contenedor">
+        <h2 class="pet-titulo-seccion">¿Cómo ayuda PETLINK?</h2>
+        <p class="pet-subtitulo">Tres pasos para acercar una mascota a su hogar.</p>
 
-            <p id="mensajeBusqueda" role="status" hidden></p>
+        <div class="pet-beneficios-grid">
+          <article class="pet-beneficio">
+            <div class="pet-beneficio-icono" aria-hidden="true">📱</div>
+            <h3>1. Escanea</h3>
+            <p>La persona que encuentra a la mascota escanea el código QR con su celular.</p>
+          </article>
 
-            <div
-                id="resultadosBusqueda"
-                class="pet-resultados"
-            ></div>
+          <article class="pet-beneficio">
+            <div class="pet-beneficio-icono" aria-hidden="true">🐾</div>
+            <h3>2. Identifica</h3>
+            <p>Consulta la foto, las características y el estado registrado de la mascota.</p>
+          </article>
 
-            <button
-                type="button"
-                id="volverInicio"
-                class="pet-boton pet-boton-secundario"
+          <article class="pet-beneficio">
+            <div class="pet-beneficio-icono" aria-hidden="true">💚</div>
+            <h3>3. Contacta</h3>
+            <p>Puede utilizar el enlace de WhatsApp del perfil para comunicarse con su propietario.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- BÚSQUEDA DE MASCOTAS -->
+    <section class="pet-seccion" id="zonaBusqueda" style="display: none;">
+      <h2 class="pet-titulo-seccion">🔎 Buscar una mascota</h2>
+      <p class="pet-subtitulo">
+        Escribe el nombre de la mascota que deseas buscar.
+      </p>
+
+      <div class="pet-busqueda">
+        <form id="formBusqueda">
+          <div class="pet-busqueda-fila">
+            <input
+              type="text"
+              id="buscarNombre"
+              name="buscarNombre"
+              placeholder="Nombre de la mascota"
+              aria-label="Nombre de la mascota"
             >
-                ← Volver al inicio
+            <button type="submit" class="pet-boton pet-boton-principal" id="ejecutarBusqueda">
+              Buscar
             </button>
-        </section>
+          </div>
+        </form>
 
-        <!-- REGISTRO: se conservan todos los IDs que usa script.js -->
-        <section
-            id="formulario"
-            class="pet-seccion"
-            hidden
-        >
-            <h2>🐾 Registrar una mascota</h2>
+        <p id="mensajeBusqueda" class="pet-mensaje" style="display: none;" aria-live="polite"></p>
+        <div id="resultadosBusqueda"></div>
 
-            <p class="pet-seccion-intro">
-                Completa los datos para crear el perfil PETLINK y generar
-                el código QR individual de tu mascota.
-            </p>
+        <div class="pet-form-botones">
+          <button type="button" class="pet-boton pet-boton-secundario" id="volverInicio">
+            ← Volver al inicio
+          </button>
+        </div>
+      </div>
+    </section>
 
-            <div class="pet-formulario">
-                <label for="nombre">Nombre de la mascota</label>
-                <input
-                    type="text"
-                    id="nombre"
-                    placeholder="Nombre de tu mascota"
-                    required
-                >
+    <!-- REGISTRO DE MASCOTA -->
+    <section class="pet-seccion" id="formulario" style="display: none;">
+      <h2 class="pet-titulo-seccion">🐾 Registra a tu mejor amigo</h2>
+      <p class="pet-subtitulo">
+        Completa los datos para crear su perfil y generar su código QR.
+      </p>
 
-                <label for="especie">Especie</label>
-                <select id="especie" required>
-                    <option value="">Selecciona una especie</option>
-                    <option value="Perro">Perro</option>
-                    <option value="Gato">Gato</option>
-                    <option value="Otro">Otro</option>
-                </select>
+      <form id="guardarMascota" class="pet-formulario" enctype="multipart/form-data">
+        <div class="pet-form-grid">
 
-                <label for="raza">Raza</label>
-                <input
-                    type="text"
-                    id="raza"
-                    placeholder="Ejemplo: mestizo, caniche..."
-                    required
-                >
+          <div class="pet-campo">
+            <label for="nombre">Nombre de la mascota *</label>
+            <input type="text" id="nombre" name="nombre" required maxlength="80" placeholder="Ej. Luna">
+          </div>
 
-                <label for="color">Color y características</label>
-                <input
-                    type="text"
-                    id="color"
-                    placeholder="Ejemplo: blanco con manchas cafés"
-                    required
-                >
+          <div class="pet-campo">
+            <label for="especie">Especie *</label>
+            <select id="especie" name="especie" required>
+              <option value="">Selecciona una opción</option>
+              <option value="Perro">Perro</option>
+              <option value="Gato">Gato</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
 
-                <label for="sexo">Sexo</label>
-                <select id="sexo" required>
-                    <option value="">Selecciona el sexo</option>
-                    <option value="Macho">Macho</option>
-                    <option value="Hembra">Hembra</option>
-                </select>
+          <div class="pet-campo">
+            <label for="raza">Raza</label>
+            <input type="text" id="raza" name="raza" maxlength="80" placeholder="Ej. Mestizo">
+          </div>
 
-                <label for="whatsapp">WhatsApp del propietario</label>
-                <input
-                    type="tel"
-                    id="whatsapp"
-                    inputmode="numeric"
-                    placeholder="Ejemplo: 59170000000"
-                    required
-                >
-                <p class="pet-ayuda">
-                    Escribe el código de país y el número, solo con dígitos.
-                    Este número se utilizará para contactar al propietario.
-                </p>
+          <div class="pet-campo">
+            <label for="color">Color y características *</label>
+            <input type="text" id="color" name="color" required maxlength="180" placeholder="Ej. Blanco con manchas cafés">
+          </div>
 
-                <label for="estado">Estado de la mascota</label>
-                <select id="estado" required>
-                    <option value="En casa">En casa</option>
-                    <option value="Perdida">Perdida</option>
-                    <option value="Encontrada">Encontrada</option>
-                </select>
+          <div class="pet-campo">
+            <label for="sexo">Sexo *</label>
+            <select id="sexo" name="sexo" required>
+              <option value="">Selecciona una opción</option>
+              <option value="Macho">Macho</option>
+              <option value="Hembra">Hembra</option>
+              <option value="No identificado">No identificado</option>
+            </select>
+          </div>
 
-                <label for="foto">Fotografía de la mascota</label>
-                <input
-                    type="file"
-                    id="foto"
-                    accept="image/*"
-                    required
-                >
-                <p class="pet-ayuda">
-                    Selecciona una imagen de hasta 5 MB.
-                </p>
+          <div class="pet-campo">
+            <label for="estado">Estado de la mascota *</label>
+            <select id="estado" name="estado" required>
+              <option value="En casa">En casa</option>
+              <option value="Perdida">Perdida</option>
+              <option value="Encontrada">Encontrada</option>
+            </select>
+          </div>
 
-                <label for="clave">Clave privada del propietario</label>
-                <input
-                    type="password"
-                    id="clave"
-                    minlength="4"
-                    autocomplete="new-password"
-                    placeholder="Crea una clave de al menos 4 caracteres"
-                    required
-                >
-                <p class="pet-ayuda">
-                    Necesitarás esta clave para administrar los datos
-                    de tu mascota. No la compartas con otras personas.
-                </p>
-
-                <div class="pet-aviso-privacidad">
-                    <strong>Importante:</strong> utiliza únicamente
-                    información necesaria para identificar a tu mascota.
-                    No escribas tu dirección particular en los campos
-                    públicos del perfil.
-                </div>
-
-                <button
-                    type="button"
-                    id="guardarMascota"
-                    class="pet-boton"
-                >
-                    Guardar mascota
-                </button>
-            </div>
-
-            <button
-                type="button"
-                id="volverDesdeRegistro"
-                class="pet-boton pet-boton-secundario"
-                style="width:100%; margin-top:12px;"
+          <div class="pet-campo pet-campo-completo">
+            <label for="whatsapp">WhatsApp de contacto del propietario *</label>
+            <input
+              type="tel"
+              id="whatsapp"
+              name="whatsapp"
+              required
+              maxlength="20"
+              placeholder="Incluye el código de país, por ejemplo 591..."
             >
-                ← Volver al inicio
-            </button>
-        </section>
-    </main>
+            <p class="pet-ayuda">
+              Revisa que el número tenga el código de país y que pueda recibir mensajes por WhatsApp.
+            </p>
+          </div>
 
-    <footer class="pet-pie">
-        <p><strong>🐾 PETLINK</strong></p>
-        <p>Una conexión que ayuda a reunir familias y mascotas.</p>
-        <p>© 2026 PETLINK · Proyecto de Sistemas Informáticos</p>
-    </footer>
+          <div class="pet-campo pet-campo-completo">
+            <label for="foto">Fotografía de la mascota</label>
+            <input type="file" id="foto" name="foto" accept="image/*">
+            <p class="pet-ayuda">Elige una foto clara de tu mascota. Si el sistema tiene un límite de tamaño, respétalo.</p>
+          </div>
 
-    <!-- Firebase: mantener estos scripts antes de script.js -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+          <div class="pet-campo pet-campo-completo">
+            <label for="clave">Clave privada para editar los datos *</label>
+            <input
+              type="password"
+              id="clave"
+              name="clave"
+              required
+              minlength="4"
+              autocomplete="new-password"
+              placeholder="Crea una clave de al menos 4 caracteres"
+            >
+            <p class="pet-ayuda">
+              Guarda esta clave en un lugar seguro. Se utilizará para las funciones de edición que ofrece el sistema.
+            </p>
+          </div>
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyCJk4zNh8inO4vJ33i8ZNblSxHuHzFTTmw",
-            authDomain: "petlink-f16e2.firebaseapp.com",
-            projectId: "petlink-f16e2",
-            storageBucket: "petlink-f16e2.firebasestorage.app",
-            messagingSenderId: "898636920537",
-            appId: "1:898636920537:web:f5bc945291877d8821b0c8",
-            measurementId: "G-BGET3HJRHC"
-        };
+        </div>
 
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
+        <div class="pet-form-botones">
+          <button type="submit" class="pet-boton pet-boton-principal">
+            💚 Registrar mascota
+          </button>
 
-        const db = firebase.firestore();
-    </script>
+          <button type="button" class="pet-boton pet-boton-secundario" id="volverDesdeRegistro">
+            ← Volver al inicio
+          </button>
+        </div>
+      </form>
 
-    <!-- No cambiar el nombre ni el orden de este archivo -->
-    <script src="script.js"></script>
+      <!-- Espacio para el QR generado por script.js -->
+      <div id="zonaQR"></div>
+    </section>
+
+  </main>
+
+  <!-- PIE DE PÁGINA -->
+  <footer class="pet-pie-pagina">
+    <strong>🐾 PETLINK</strong>
+    <p>Una conexión digital para ayudar a reunir mascotas con sus familias.</p>
+    <p>Hecho con amor por quienes saben que una mascota es parte de la familia. 💚</p>
+  </footer>
+
+  <!-- FIREBASE: CONSERVAR COMPATIBILIDAD CON script.js -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCJk4zNh8inO4vJ33i8ZNblSxHuHzFTTmw",
+      authDomain: "petlink-f16e2.firebaseapp.com",
+      projectId: "petlink-f16e2",
+      storageBucket: "petlink-f16e2.firebasestorage.app",
+      messagingSenderId: "898636920537",
+      appId: "1:898636920537:web:f5bc945291877d8821b0c8",
+      measurementId: "G-BGET3HJRHC"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+
+    const db = firebase.firestore();
+  </script>
+
+  <!-- NO BORRAR: CONTIENE LAS FUNCIONES DE PETLINK -->
+  <script src="./script.js"></script>
+
 </body>
 </html>
