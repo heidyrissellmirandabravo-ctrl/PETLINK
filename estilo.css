@@ -647,3 +647,42 @@ max-width: 100%;
     font-size: 19px;
   }
 }
+/* CORREGIR MARCA DE AGUA: SOLO DETRAS DEL CONTENIDO */
+
+#inicio {
+  position: relative;
+  isolation: isolate;
+  background-color: transparent;
+}
+
+#inicio > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Los botones conservan sus colores sólidos */
+#inicio #btnBuscarMascota,
+#inicio #btnRegistrar {
+  position: relative;
+  z-index: 2;
+  opacity: 1;
+  filter: none;
+  background-image: none;
+}
+
+#inicio #btnBuscarMascota {
+  background-color: #237b50;
+  color: #ffffff;
+}
+
+#inicio #btnRegistrar {
+  background-color: #ed8a27;
+  color: #ffffff;
+}
+
+/* Evitar que una imagen de fondo tape los botones */
+#inicio::before,
+#inicio::after {
+  pointer-events: none;
+  z-index: 0;
+}
