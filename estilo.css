@@ -684,3 +684,35 @@ footer p {
     left: auto !important;
     right: auto !important;
 }
+/* AJUSTE FINAL: BOTONES CENTRADOS EN PETLINK */
+#presentacion {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+}
+
+#presentacion #btnRegistrar,
+#presentacion #btnBuscarMascota {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 320px !important;
+    max-width: 100% !important;
+    min-height: 72px !important;
+    margin: 12px auto !important;
+    padding: 18px 22px !important;
+    box-sizing: border-box !important;
+    font-size: 20px !important;
+    font-weight: 800 !important;
+    border-radius: 18px !important;
+}
+
+#presentacion #btnRegistrar {
+    background: linear-gradient(135deg, #ffbd4a, #ed8124) !important;
+    color: #ffffff !important;
+}
+
+#presentacion #btnBuscarMascota {
+    background: linear-gradient(135deg, #329967, #17603e) !important;
+    color: #ffffff !important;
+}
