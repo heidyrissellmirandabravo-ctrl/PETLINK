@@ -663,3 +663,24 @@ footer p {
         box-sizing: border-box;
     }
 }
+#presentacion #btnRegistrar,
+#presentacion #btnBuscarMascota {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 280px !important;
+    max-width: 90% !important;
+    min-height: 65px !important;
+    margin: 14px auto !important;
+    box-sizing: border-box !important;
+    font-size: 18px !important;
+    font-weight: bold !important;
+}
+
+/* CENTRAR EL GRUPO DE BOTONES */
+#presentacion #btnRegistrar,
+#presentacion #btnBuscarMascota {
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+}
