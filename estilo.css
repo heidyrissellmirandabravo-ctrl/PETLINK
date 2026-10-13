@@ -612,3 +612,54 @@ footer p {
     transition: none !important;
   }
 }
+/* BOTONES PRINCIPALES DE PETLINK */
+#presentacion #btnRegistrar,
+#presentacion #btnBuscarMascota,
+#btnRegistrar,
+#btnBuscarMascota {
+    min-width: 230px;
+    min-height: 62px;
+    padding: 17px 26px;
+    font-size: 18px;
+    font-weight: 800;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* CENTRAR LOS DOS BOTONES */
+#btnRegistrar,
+#btnBuscarMascota {
+    margin: 10px;
+}
+
+/* EFECTO AL PASAR EL CURSOR */
+#btnRegistrar:hover,
+#btnBuscarMascota:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.16);
+}
+
+/* CENTRADO EN LA PORTADA */
+#presentacion {
+    text-align: center;
+}
+
+#presentacion #btnRegistrar,
+#presentacion #btnBuscarMascota {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ADAPTACIÓN A CELULARES */
+@media (max-width: 600px) {
+    #btnRegistrar,
+    #btnBuscarMascota {
+        display: flex;
+        width: 100%;
+        max-width: 340px;
+        margin: 10px auto;
+        box-sizing: border-box;
+    }
+}
