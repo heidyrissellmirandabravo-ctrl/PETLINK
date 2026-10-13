@@ -1,18 +1,17 @@
-/* =====================================
-   PETLINK - Diseño moderno y amigable
-   ===================================== */
+/* =========================================
+   PETLINK - Diseño moderno, elegante y tierno
+   ========================================= */
 
 :root {
-    --principal: #477bce;
-    --principal-oscuro: #315da7;
-    --secundario: #8b72cf;
+    --azul: #477bce;
+    --azul-oscuro: #315da7;
+    --morado: #8b72cf;
     --fondo: #f5f7ff;
     --blanco: #ffffff;
     --texto: #30384b;
     --texto-suave: #697386;
     --borde: #e5e9f3;
-    --sombra: 0 10px 30px rgba(54, 76, 120, 0.09);
-    --radio: 20px;
+    --sombra: 0 12px 32px rgba(54, 76, 120, 0.10);
 }
 
 * {
@@ -25,103 +24,112 @@ html {
 
 body {
     margin: 0;
+    padding: 0;
     font-family: "Segoe UI", Arial, sans-serif;
-    background:
-        radial-gradient(circle at top left, #e9edff 0, transparent 35%),
-        var(--fondo);
-    color: var(--texto);
+    background: #f5f7ff !important;
+    background-image:
+        radial-gradient(circle at top left, #e9edff, transparent 40%) !important;
+    color: var(--texto) !important;
+    line-height: 1.7;
     text-align: center;
-    line-height: 1.6;
 }
 
-/* Encabezado */
+/* ENCABEZADO */
 
 header {
-    padding: 45px 20px 35px;
-    background: linear-gradient(135deg, #477bce, #8b72cf);
-    color: white;
-    border-radius: 0 0 35px 35px;
-    box-shadow: 0 8px 25px rgba(71, 123, 206, 0.2);
+    position: relative;
+    overflow: hidden;
+    padding: 42px 20px 36px;
+    background: linear-gradient(135deg, #477bce, #8b72cf) !important;
+    color: white !important;
+    border-radius: 0 0 32px 32px;
+    box-shadow: 0 8px 25px rgba(71, 123, 206, 0.20);
 }
 
-header h1,
-header h2,
+header h1 {
+    margin: 0;
+    font-size: clamp(34px, 5vw, 48px);
+    font-weight: 800;
+    letter-spacing: -1px;
+    color: white !important;
+}
+
 header p {
-    color: white;
+    margin: 10px auto 0;
+    max-width: 650px;
+    color: white !important;
+    font-size: 17px;
+}
+
+/* CONTENIDO */
+
+main {
+    width: 100%;
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 0 16px;
+}
+
+section {
+    position: relative;
+    width: 100%;
+    max-width: 850px;
+    margin: 26px auto;
+    padding: clamp(22px, 4vw, 38px);
+    background: white !important;
+    border: 1px solid #e5e9f3;
+    border-radius: 22px;
+    box-shadow: var(--sombra);
+    text-align: center;
 }
 
 h1 {
-    color: var(--principal);
-    margin: 15px 0;
-    font-size: clamp(30px, 5vw, 46px);
-    line-height: 1.2;
-    font-weight: 800;
-    letter-spacing: -1px;
+    color: var(--azul) !important;
 }
 
 h2 {
-    color: var(--texto);
-    font-size: clamp(22px, 3vw, 29px);
     margin-top: 0;
     margin-bottom: 18px;
+    color: var(--texto) !important;
+    font-size: clamp(23px, 3vw, 30px);
+    line-height: 1.3;
 }
 
 h3 {
-    color: var(--principal-oscuro);
+    color: var(--azul-oscuro) !important;
+    font-size: 21px;
 }
 
 p {
-    font-size: 17px;
     max-width: 680px;
-    margin: 15px auto;
+    margin: 14px auto;
+    color: var(--texto-suave) !important;
+    font-size: 16px;
     line-height: 1.8;
-    color: var(--texto-suave);
 }
 
-/* Secciones y tarjetas */
-
-section {
-    background-color: var(--blanco);
-    width: calc(100% - 32px);
-    max-width: 850px;
-    margin: 30px auto;
-    padding: clamp(22px, 4vw, 38px);
-    border: 1px solid rgba(229, 233, 243, 0.9);
-    border-radius: var(--radio);
-    box-shadow: var(--sombra);
-    text-align: center;
-    transition: box-shadow 0.25s ease,
-                transform 0.25s ease;
-}
-
-section:hover {
-    box-shadow: 0 14px 36px rgba(54, 76, 120, 0.13);
-}
-
-/* Botones */
+/* BOTONES */
 
 button {
-    background: linear-gradient(135deg, var(--principal), #5d91e2);
-    color: white;
+    display: inline-block;
+    width: auto;
+    min-height: 46px;
+    margin: 9px 5px;
+    padding: 13px 22px;
     border: none;
-    padding: 13px 23px;
     border-radius: 12px;
-    font-size: 16px;
+    background: linear-gradient(135deg, #477bce, #8b72cf) !important;
+    color: white !important;
+    font-family: inherit;
+    font-size: 15px;
     font-weight: 700;
+    line-height: 1.4;
     cursor: pointer;
-    margin: 8px 5px;
-    box-shadow: 0 5px 12px rgba(71, 123, 206, 0.18);
-    transition: transform 0.2s ease,
-                box-shadow 0.2s ease,
-                background 0.2s ease;
+    box-shadow: 0 5px 14px rgba(71, 123, 206, 0.18);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 button:hover {
-    background: linear-gradient(
-        135deg,
-        var(--principal-oscuro),
-        var(--principal)
-    );
     transform: translateY(-2px);
     box-shadow: 0 8px 18px rgba(71, 123, 206, 0.25);
 }
@@ -130,20 +138,26 @@ button:active {
     transform: scale(0.98);
 }
 
-button:focus-visible,
-input:focus-visible {
-    outline: 3px solid #b9ccff;
-    outline-offset: 3px;
+button.boton-secundario {
+    background: #edf0ff !important;
+    color: #315da7 !important;
+    border: 1px solid #cbd5ff;
+    box-shadow: none;
 }
 
-/* Formularios */
+button.boton-secundario:hover {
+    background: #e0e6ff !important;
+}
 
-#formulario {
-    margin-top: 25px;
-    padding: 24px;
-    background: #f7f8ff;
-    border: 1px solid var(--borde);
-    border-radius: 16px;
+/* FORMULARIOS */
+
+label {
+    display: block;
+    max-width: 520px;
+    margin: 17px auto 6px;
+    color: var(--texto) !important;
+    font-weight: 700;
+    text-align: left;
 }
 
 input,
@@ -152,23 +166,22 @@ textarea {
     display: block;
     width: 100%;
     max-width: 520px;
-    margin: 13px auto;
-    padding: 14px 16px;
+    min-height: 46px;
+    margin: 7px auto 12px;
+    padding: 12px 14px;
     border: 1px solid #dce2ef;
     border-radius: 11px;
-    background: white;
-    color: var(--texto);
+    background: white !important;
+    color: var(--texto) !important;
     font-family: inherit;
     font-size: 16px;
-    transition: border-color 0.2s ease,
-                box-shadow 0.2s ease;
 }
 
 input:focus,
 select:focus,
 textarea:focus {
     outline: none;
-    border-color: var(--principal);
+    border-color: var(--azul);
     box-shadow: 0 0 0 4px rgba(71, 123, 206, 0.12);
 }
 
@@ -177,97 +190,181 @@ textarea::placeholder {
     color: #9aa3b5;
 }
 
-/* Fotografías de mascotas */
+input[type="file"] {
+    padding: 10px;
+    background: #f8f9ff !important;
+}
+
+.texto-ayuda {
+    display: block;
+    max-width: 520px;
+    margin: 5px auto 12px;
+    color: var(--texto-suave) !important;
+    font-size: 13px;
+    line-height: 1.6;
+    text-align: left;
+}
+
+/* REGISTRO Y BÚSQUEDA */
+
+#formulario {
+    background: #f9faff !important;
+    border: 1px solid var(--borde);
+}
+
+#zonaBusqueda {
+    margin-top: 24px;
+    padding-top: 15px;
+    border-top: 1px solid var(--borde);
+}
+
+#resultadosBusqueda {
+    margin-top: 22px;
+}
+
+.tarjeta-mascota {
+    margin: 18px auto;
+    padding: 20px;
+    max-width: 600px;
+    background: #fbfcff !important;
+    border: 1px solid #e0e6f5;
+    border-radius: 17px;
+    box-shadow: 0 5px 16px rgba(54, 76, 120, 0.06);
+    text-align: center;
+}
+
+.tarjeta-mascota img {
+    display: block;
+    width: 100%;
+    max-width: 420px;
+    max-height: 300px;
+    margin: 0 auto 15px;
+    object-fit: contain;
+    border-radius: 14px;
+    background: #f0f2fa;
+}
+
+.tarjeta-mascota h3 {
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+/* MENSAJES */
+
+.mensaje {
+    margin: 16px auto;
+    padding: 14px 16px;
+    border: 1px solid #dce4fa;
+    border-radius: 12px;
+    background: #f0f4ff !important;
+    color: #315da7 !important;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+.nota-privacidad {
+    margin: 15px auto;
+    padding: 14px;
+    border: 1px solid #f0dfae;
+    border-radius: 12px;
+    background: #fff8e8 !important;
+    color: #745b2a !important;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* FOTOGRAFÍAS Y CÓDIGOS QR */
 
 img {
     max-width: 100%;
     height: auto;
 }
 
-section img {
-    border-radius: 16px;
-}
-
-/* Enlaces */
-
-a {
-    color: var(--principal-oscuro);
-    text-decoration: none;
-    transition: color 0.2s ease;
-}
-
-a:hover {
-    color: var(--secundario);
-    text-decoration: underline;
-}
-
-/* Códigos QR */
-
 canvas {
     max-width: 100%;
     height: auto;
 }
 
-/* Pie de página */
+/* ENLACES */
+
+a {
+    color: var(--azul-oscuro);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--morado);
+    text-decoration: underline;
+}
+
+/* PIE DE PÁGINA */
 
 footer {
-    padding: 28px 20px;
     margin-top: 45px;
-    background: #e9edff;
-    color: var(--texto-suave);
-    border-top: 1px solid var(--borde);
+    padding: 28px 20px;
+    background: #e9edff !important;
+    border-top: 1px solid #dce3fa;
+    color: var(--texto-suave) !important;
 }
 
 footer p {
-    font-size: 14px;
     margin: 5px auto;
+    color: var(--texto-suave) !important;
+    font-size: 14px;
 }
 
-/* Adaptación a celulares */
+/* RESPETO A LOS ELEMENTOS OCULTOS */
+
+[hidden] {
+    display: none !important;
+}
+
+/* ADAPTACIÓN A CELULARES */
 
 @media (max-width: 600px) {
     header {
         padding: 32px 16px;
-        border-radius: 0 0 25px 25px;
+        border-radius: 0 0 24px 24px;
+    }
+
+    header p {
+        font-size: 15px;
+    }
+
+    main {
+        margin-top: 18px;
+        padding: 0 12px;
     }
 
     section {
-        width: calc(100% - 24px);
         margin: 18px auto;
         padding: 22px 16px;
         border-radius: 17px;
     }
 
-    h1 {
-        letter-spacing: -0.5px;
-    }
-
-    p {
-        font-size: 16px;
-    }
-
     button {
-        max-width: 100%;
-        padding: 12px 17px;
-        font-size: 15px;
+        width: 100%;
+        margin: 8px 0;
+        padding: 13px 14px;
     }
 
-    #formulario {
-        padding: 16px 12px;
+    label {
+        margin-top: 15px;
     }
 
-    input,
-    select,
-    textarea {
-        font-size: 16px;
+    .tarjeta-mascota {
+        padding: 14px;
     }
 }
+
+/* ANIMACIONES SUAVES Y ACCESIBILIDAD */
 
 @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
     *::after {
         scroll-behavior: auto !important;
+        animation: none !important;
         transition: none !important;
     }
 }
