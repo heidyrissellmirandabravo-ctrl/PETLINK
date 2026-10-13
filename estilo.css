@@ -516,3 +516,74 @@ min-width: 0;
 max-width: 100%;
 }
 }
+/* ===== BOTONES PRINCIPALES PETLINK ===== */
+#btnBuscarMascota,
+#btnRegistrar {
+  min-height: 58px;
+  padding: 16px 28px;
+  border: 0;
+  border-radius: 16px;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  color: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 7px 18px rgba(25, 88, 61, 0.25);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#btnBuscarMascota {
+  background: linear-gradient(135deg, #287a55, #19583d);
+}
+
+#btnRegistrar {
+  background: linear-gradient(135deg, #f2a93b, #e78320);
+  color: #ffffff;
+}
+
+#btnBuscarMascota:hover,
+#btnRegistrar:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 11px 24px rgba(25, 88, 61, 0.3);
+}
+
+#btnBuscarMascota:active,
+#btnRegistrar:active {
+  transform: scale(0.98);
+}
+
+/* En teléfonos, los botones se ven grandes y cómodos */
+@media (max-width: 600px) {
+  #btnBuscarMascota,
+  #btnRegistrar {
+    width: 100%;
+    min-height: 58px;
+    font-size: 17px;
+  }
+}
+
+/* ===== MEJOR ENCUADRE DE LAS FOTOS ===== */
+.hero-galeria {
+  align-items: stretch;
+}
+
+.hero-foto {
+  overflow: hidden;
+  border-radius: 20px;
+}
+
+.hero-foto img {
+  display: block;
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  object-position: center 25%;
+  border-radius: 20px;
+}
+
+@media (max-width: 600px) {
+  .hero-foto img {
+    height: 230px;
+    object-position: center 20%;
+  }
+}
