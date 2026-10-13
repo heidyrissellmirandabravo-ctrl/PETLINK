@@ -686,3 +686,34 @@ max-width: 100%;
   pointer-events: none;
   z-index: 0;
 }
+/* ===== MARCA DE AGUA DE PETLINK ===== */
+#inicio {
+  position: relative;
+  isolation: isolate;
+  background-color: transparent;
+}
+
+#inicio::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: url("./.github/petfoto-pet-8147283.jpg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  opacity: 0.10;
+}
+
+#inicio > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Los botones permanecen visibles y sólidos */
+#inicio #btnBuscarMascota,
+#inicio #btnRegistrar {
+  opacity: 1;
+  filter: none;
+}
