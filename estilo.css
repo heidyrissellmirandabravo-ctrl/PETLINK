@@ -42,7 +42,7 @@ header {
     padding: 42px 20px 36px;
     background: linear-gradient(135deg, #477bce, #8b72cf) !important;
     color: white !important;
-    border-radius: 0 0 32px 32px;
+    border-radius: 0;
     box-shadow: 0 8px 25px rgba(71, 123, 206, 0.20);
 }
 
