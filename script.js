@@ -1051,3 +1051,272 @@ function mostrarMascotaNoEncontrada() {
     principal.appendChild(tarjeta);
     document.body.appendChild(principal);
 }
+/* ==========================================
+   DISEÑO VISUAL PETLINK
+   Solo modifica la apariencia de la página.
+   ========================================== */
+
+(function mejorarDisenoPetlink() {
+    const tienePerfilQR = new URLSearchParams(
+        window.location.search
+    ).has("id");
+
+    if (tienePerfilQR) {
+        document.body.classList.add("petlink-perfil-publico");
+    }
+
+    const estilo = document.createElement("style");
+
+    estilo.id = "estilo-visual-petlink";
+
+    estilo.textContent = `
+        /* DISEÑO GENERAL DEL PERFIL QR */
+        body.petlink-perfil-publico {
+            margin: 0;
+            padding: 0;
+            background: #f0f7f4;
+            color: #263a32;
+            font-family: Arial, Helvetica, sans-serif;
+            line-height: 1.6;
+        }
+
+        body.petlink-perfil-publico header {
+            background: linear-gradient(135deg, #167d63, #25a785);
+            color: white;
+            text-align: center;
+            padding: 22px 15px;
+            box-shadow: 0 3px 12px #00000018;
+        }
+
+        body.petlink-perfil-publico header h1 {
+            margin: 0;
+            font-size: 30px;
+        }
+
+        body.petlink-perfil-publico header p {
+            margin: 5px 0 0;
+        }
+
+        body.petlink-perfil-publico main {
+            width: calc(100% - 28px);
+            max-width: 560px;
+            margin: 24px auto;
+        }
+
+        body.petlink-perfil-publico main section {
+            box-sizing: border-box;
+            background: white;
+            padding: 24px;
+            border-radius: 20px;
+            box-shadow: 0 5px 22px #244b3a14;
+            overflow-wrap: anywhere;
+        }
+
+        /* FOTO MÁS PROPORCIONADA */
+        body.petlink-perfil-publico main section img {
+            display: block;
+            width: 170px !important;
+            height: 170px !important;
+            max-width: 100%;
+            object-fit: cover;
+            border-radius: 18px !important;
+            margin: 0 auto 18px !important;
+            border: 4px solid #e1f3eb;
+            box-sizing: border-box;
+        }
+
+        /* NOMBRE Y DATOS */
+        body.petlink-perfil-publico main section h2 {
+            color: #167d63;
+            text-align: center;
+            font-size: 27px;
+            line-height: 1.25;
+            margin: 10px 0 22px;
+            overflow-wrap: anywhere;
+        }
+
+        body.petlink-perfil-publico main section p {
+            margin: 9px 0;
+            padding: 9px 12px;
+            background: #f5f9f7;
+            border-radius: 9px;
+            font-size: 15px;
+        }
+
+        body.petlink-perfil-publico main section h3 {
+            margin: 18px 0 10px;
+            color: #28614e;
+            font-size: 19px;
+        }
+
+        /* ESTADO DESTACADO */
+        body.petlink-perfil-publico main section h3:has(+ p) {
+            color: #28614e;
+        }
+
+        body.petlink-perfil-publico main section h3[style*="background"] {
+            text-align: center;
+            padding: 13px;
+            border-radius: 12px;
+            font-size: 19px;
+        }
+
+        /* BOTONES DEL PERFIL */
+        body.petlink-perfil-publico main section button {
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+            border: none;
+            border-radius: 11px;
+            padding: 13px 15px;
+            margin: 12px 0;
+            background: #e7f3ee;
+            color: #17664f;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.15s, filter 0.15s;
+        }
+
+        body.petlink-perfil-publico main section button:hover {
+            filter: brightness(0.96);
+            transform: translateY(-1px);
+        }
+
+        /* BOTÓN WHATSAPP: MÁS VISIBLE */
+        body.petlink-perfil-publico main section button:first-of-type {
+            background: #20a765;
+            color: white;
+            padding: 15px;
+            font-size: 16px;
+            box-shadow: 0 4px 10px #20a76530;
+        }
+
+        body.petlink-perfil-publico main section hr {
+            border: none;
+            border-top: 1px solid #e3ece7;
+            margin: 22px 0;
+        }
+
+        body.petlink-perfil-publico footer {
+            text-align: center;
+            padding: 15px;
+            color: #61786c;
+            font-size: 13px;
+        }
+
+        /* RESULTADOS DE BÚSQUEDA */
+        #resultadosBusqueda {
+            display: grid;
+            grid-template-columns: repeat(
+                auto-fit,
+                minmax(min(100%, 245px), 1fr)
+            );
+            gap: 16px;
+            align-items: start;
+        }
+
+        #resultadosBusqueda > h3,
+        #resultadosBusqueda > p {
+            grid-column: 1 / -1;
+        }
+
+        #resultadosBusqueda .tarjeta-mascota {
+            box-sizing: border-box;
+            min-width: 0;
+            padding: 16px;
+            margin: 0;
+            background: white;
+            border: 1px solid #e1eee7;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px #244b3a12;
+            overflow-wrap: anywhere;
+        }
+
+        #resultadosBusqueda .tarjeta-mascota > img {
+            display: block;
+            width: 100%;
+            max-width: 145px;
+            height: 120px;
+            object-fit: cover;
+            margin: 0 auto 12px;
+            border-radius: 12px;
+        }
+
+        #resultadosBusqueda .tarjeta-mascota h3 {
+            color: #167d63;
+            font-size: 20px;
+            margin: 8px 0 12px;
+        }
+
+        #resultadosBusqueda .tarjeta-mascota p {
+            font-size: 14px;
+            line-height: 1.45;
+            margin: 7px 0;
+            overflow-wrap: anywhere;
+        }
+
+        #resultadosBusqueda .tarjeta-mascota h4 {
+            margin: 15px 0 8px;
+            font-size: 15px;
+            color: #28614e;
+        }
+
+        #resultadosBusqueda .qr-mascota {
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        #resultadosBusqueda .qr-mascota canvas,
+        #resultadosBusqueda .qr-mascota img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        #resultadosBusqueda .tarjeta-mascota button {
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+            border: none;
+            border-radius: 9px;
+            padding: 11px;
+            margin: 9px 0;
+            background: #197b60;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #resultadosBusqueda .tarjeta-mascota button:hover {
+            filter: brightness(0.92);
+        }
+
+        @media (max-width: 480px) {
+            body.petlink-perfil-publico main {
+                width: calc(100% - 20px);
+                margin: 14px auto;
+            }
+
+            body.petlink-perfil-publico main section {
+                padding: 17px;
+                border-radius: 15px;
+            }
+
+            body.petlink-perfil-publico main section img {
+                width: 150px !important;
+                height: 150px !important;
+            }
+
+            body.petlink-perfil-publico main section h2 {
+                font-size: 24px;
+            }
+
+            #resultadosBusqueda {
+                grid-template-columns: 1fr;
+            }
+        }
+    `;
+
+    document.head.appendChild(estilo);
+})();
